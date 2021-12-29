@@ -77,7 +77,7 @@ function isExportDefaultModifier(modifiers?: ModifiersArray) {
 }
 
 function parseFunctionArguments(statements: NodeArray<Statement>) {
-  let functionDeclaration = statements.find(
+  const functionDeclaration = statements.find(
     (statement) => isFunctionDeclaration(statement) && isExportDefaultModifier(statement.modifiers),
   ) as FunctionDeclaration | undefined
 
@@ -137,6 +137,7 @@ async function parse(pathname: string) {
   const fileContent = await fs.readFile(pathname, 'utf8')
 
   const sourceFile = createSourceFile(pathname, fileContent, ScriptTarget.ESNext)
+  // eslint-disable-next-line no-console
   console.log(JSON.stringify(parseFunctionArguments(sourceFile.statements), null, 2))
 }
 
