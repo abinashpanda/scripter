@@ -54,7 +54,7 @@ export const description = {
 export default async function searchUsers(
   firstName?: string,
   lastName?: string,
-  /** @paramName "Registered during" */ dateRange?: DateRange,
+  /** @scripterParam "Registered during" */ dateRange?: DateRange,
 ) {
   const { data } = await axios.get<User>(`/users`, {
     params: {
