@@ -7,7 +7,7 @@ import {
   isVariableStatement,
   SyntaxKind,
 } from 'typescript'
-import type { FunctionDeclaration, Identifier, ArrowFunction, FunctionExpression } from 'typescript'
+import type { FunctionDeclaration, Identifier, ArrowFunction, FunctionExpression, ExportAssignment } from 'typescript'
 import { upperFirst, words, lowerCase } from 'lodash'
 import { getParamData, getParamsMetaDataFromJSDoc } from './param'
 import type { ParamMeta, ParamWithDescription } from './param'
@@ -56,14 +56,13 @@ export function parse(fileContent: string) {
   const { statements } = sourceFile
 
   let functionDeclaration: FunctionDeclaration | ArrowFunction | undefined
-  let functionName: string | undefined
 
   // This assumes that the function is exported as default and there is a single default declaration
   // if there would be multiple default declarations, we still don't care about others because the code is invalid
   // and won't compile, so getting wrong data doesn't matter in that case
   const exportDefaultStatement = statements.find(isExportAssignment)
   if (exportDefaultStatement) {
-    functionName = (exportDefaultStatement.expression as Identifier).escapedText as string | undefined
+    const functionName = (exportDefaultStatement.expression as Identifier).escapedText as string | undefined
     /**
      * Handles the case
      *
@@ -99,17 +98,30 @@ export function parse(fileContent: string) {
         }
       }
     }
-  } else {
-    /**
-     * Handles the case
-     *
-     * export default function foo() {}
-     */
+  }
+
+  /**
+   * Handles the case
+   *
+   * export default function foo() {}
+   */
+  if (!functionDeclaration) {
     functionDeclaration = statements.find(
       (statement) => isFunctionDeclaration(statement) && isExportDefaultStatement(statement),
     ) as FunctionDeclaration | undefined
-    if (functionDeclaration) {
-      functionName = functionDeclaration.name?.escapedText as string | undefined
+  }
+
+  /**
+   * Handles the case
+   *
+   * export default () => {}
+   */
+  if (!functionDeclaration) {
+    const exportDefaultStatement = statements.find(
+      (statement) => isExportAssignment(statement) && statement.expression.kind === SyntaxKind.ArrowFunction,
+    )
+    if (exportDefaultStatement) {
+      functionDeclaration = (exportDefaultStatement as ExportAssignment).expression as ArrowFunction
     }
   }
 
@@ -117,5 +129,5 @@ export function parse(fileContent: string) {
     throw new Error('No default scripter function found')
   }
 
-  return { functionName, ...parseFunctionParams(functionDeclaration) }
+  return parseFunctionParams(functionDeclaration)
 }
