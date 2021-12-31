@@ -1,7 +1,8 @@
 {
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "globals": {},
   "extends": ["plugin:react/recommended", "standard", "plugin:react-hooks/recommended", "plugin:import/typescript"],

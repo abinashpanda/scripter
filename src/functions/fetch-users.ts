@@ -3,7 +3,7 @@ export const description = {
   description: 'Fetch people using SWAPI',
 }
 
-export default async function fetchPeople(
+async function fetchUsers(
   // eslint-disable-next-line
   id: string,
   // eslint-disable-next-line
@@ -13,3 +13,5 @@ export default async function fetchPeople(
 ) {
   return {}
 }
+
+export default fetchUsers
