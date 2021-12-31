@@ -1,6 +1,9 @@
 import { parse } from './parser'
 
 describe('parser', () => {
+  /**
+   * export default function foo() {}
+   */
   it('parses export default function statement correctly', () => {
     const input = `
     export const description = {
@@ -55,7 +58,12 @@ describe('parser', () => {
     })
   })
 
-  it.skip('parses function statements correctly when declared and exported separtely', () => {
+  /**
+   * function foo() {}
+   *
+   * export default foo
+   */
+  it('parses function statements correctly when declared and exported separtely', () => {
     const input = `
     export const description = {
       title: 'Fetch people',
@@ -79,7 +87,7 @@ describe('parser', () => {
     const result = parse(input)
 
     expect(result).toEqual({
-      functionName: 'fetchUser',
+      functionName: 'fetchUsers',
       params: [
         {
           identifier: 'id',
@@ -107,6 +115,64 @@ describe('parser', () => {
             maxValue: 40,
             step: 5,
           },
+        },
+      ],
+    })
+  })
+
+  /**
+   * const foo = () => {}
+   *
+   * export default foo
+   */
+  it('parses function statement correctly when declared using a const with arrow function and exported separately', () => {
+    const input = `
+    // eslint-disable-next-line
+    const deleteUser = async (userEmail: string) => {}
+
+    export default deleteUser
+    `
+
+    const result = parse(input)
+
+    expect(result).toEqual({
+      functionName: 'deleteUser',
+      params: [
+        {
+          identifier: 'userEmail',
+          label: 'User email',
+          type: 'string',
+          required: true,
+          meta: {},
+        },
+      ],
+    })
+  })
+
+  /**
+   * const foo = function bar() {}
+   *
+   * export default foo
+   */
+  it('parses function statement correctly when declared using a const with function expression and exported separately', () => {
+    const input = `
+    // eslint-disable-next-line
+    const deleteUser = async function (userEmail: string) {}
+
+    export default deleteUser
+    `
+
+    const result = parse(input)
+
+    expect(result).toEqual({
+      functionName: 'deleteUser',
+      params: [
+        {
+          identifier: 'userEmail',
+          label: 'User email',
+          type: 'string',
+          required: true,
+          meta: {},
         },
       ],
     })
