@@ -1,5 +1,7 @@
 # scripter
 
+[![tests](https://github.com/abinashpanda/scripter/actions/workflows/tests.yml/badge.svg)](https://github.com/abinashpanda/scripter/actions/workflows/tests.yml)
+
 ## Getting Started
 
 ### Project Structure
