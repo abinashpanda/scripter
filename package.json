@@ -4,9 +4,12 @@
   "description": "Build internal tools faster",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --verbose",
-    "test:ci": "jest --verbose"
+    "test": "turbo run test",
+    "test:ci": "turbo run test:ci"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -33,11 +36,20 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0"
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "ts-jest": "^27.1.2",
+    "turbo": "^1.0.24"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "turbo": {
+    "baseBranch": "origin/develop",
+    "pipeline": {
+      "test": {},
+      "test:ci": {}
     }
   }
 }

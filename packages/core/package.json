@@ -1,0 +1,15 @@
+{
+  "name": "@scripter/core",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --watch --verbose",
+    "test:ci": "jest --verbose"
+  },
+  "devDependencies": {
+    "@scripter/configs": "*"
+  },
+  "jest": {
+    "preset": "@scripter/configs/jest/node"
+  }
+}
