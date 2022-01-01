@@ -1,52 +1,63 @@
 import * as path from 'path'
+import * as fs from 'fs/promises'
 import { compile } from '../compiler'
 
 const scripterFunctionsDir = path.resolve(__dirname, './__fixtures__/functions')
 const buildDir = path.resolve(__dirname, './__fixtures__/build')
 
 describe('compiler', () => {
+  afterEach(async function deleteBuildOutput() {
+    await fs.rm(buildDir, { recursive: true })
+  })
+
   it('builds function routes correctly', async () => {
     const result = await compile(scripterFunctionsDir, buildDir)
-    expect(result.paths).toEqual([
+    const { routes } = result
+
+    expect(routes).toEqual([
       {
         type: 'function',
         title: 'Ping',
-        path: 'ping',
+        route: 'ping',
       },
       {
         type: 'function',
         title: 'Sum',
-        path: 'sum',
+        route: 'sum',
       },
       {
-        type: 'directory',
+        type: 'module',
         title: 'User',
-        path: 'user',
+        route: 'user',
         children: [
           {
             type: 'function',
             title: 'Fetch all users',
-            path: 'user____fetch-all-users',
+            route: 'user/fetch-all-users',
           },
           {
             type: 'function',
             title: 'Fetch user by email',
-            path: 'user____fetch-user-by-email',
+            route: 'user/fetch-user-by-email',
           },
           {
-            type: 'directory',
+            type: 'module',
             title: 'Delete',
-            path: 'user____delete',
+            route: 'user/delete',
             children: [
               {
                 type: 'function',
                 title: 'Delete user',
-                path: 'user____delete____delete-user',
+                route: 'user/delete/delete-user',
               },
             ],
           },
         ],
       },
     ])
+
+    // check build file is present in the outdir
+    const buildOutput = await fs.readdir(buildDir)
+    expect(buildOutput).toEqual(['index.js'])
   })
 })
