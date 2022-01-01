@@ -48,6 +48,9 @@
   "turbo": {
     "baseBranch": "origin/develop",
     "pipeline": {
+      "dev": {
+        "cache": false
+      },
       "test": {},
       "test:ci": {}
     }
