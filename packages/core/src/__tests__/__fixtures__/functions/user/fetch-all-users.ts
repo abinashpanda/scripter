@@ -1,10 +1,12 @@
 import { users } from '../data/users'
 
-// export const description = {
-//   title: 'Fetch Users',
-//   description: 'Function returning dummy users',
-// }
-
-export default function fetchAllUsers() {
+export default function fetchAllUsers(
+  // eslint-disable-next-line
+  id: string,
+  // eslint-disable-next-line
+  /** @scripterParam Date of Birth */ /** @maxDate now */ date: Date,
+  // eslint-disable-next-line
+  /** @scripterParam People Height */ /** @minValue 20 */ /** @maxValue 40 */ /** @step 5 */ height?: number,
+) {
   return users
 }

@@ -3,6 +3,7 @@ import * as path from 'path'
 import type { Route } from './route'
 import { resolveRoute, getRouteTitle } from './route'
 import { compileProgram } from './program'
+import { parse } from './parser'
 
 async function isDir(path: string): Promise<boolean> {
   const stat = await fs.lstat(path)
@@ -39,10 +40,12 @@ async function compileRoutes(rootDirPath: string, rootDirName?: string) {
 
   for (const file of files) {
     const fileName = file.replace('.ts', '')
+    const fileContent = await fs.readFile(path.resolve(rootDirPath, file), 'utf-8')
     routes.push({
       type: 'function',
       route: resolveRoute(fileName, rootDirName),
       title: getRouteTitle(fileName),
+      params: parse(fileContent).params,
     })
   }
 
