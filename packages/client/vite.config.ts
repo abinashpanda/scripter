@@ -6,6 +6,9 @@ import { colors } from './theme'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    process: {},
+  },
   css: {
     preprocessorOptions: {
       less: {

@@ -50,3 +50,15 @@ export function getFunctionRoutes(routes: Route[]): FunctionRoute[] {
 
   return functionRoutes
 }
+
+export function getModuleRoutes(routes: Route[]): ModuleRoute[] {
+  const moduleRoutes = routes.filter(isModule)
+  for (const moduleRoute of moduleRoutes) {
+    const childrenRoutes = getModuleRoutes(moduleRoute.children)
+    childrenRoutes.forEach((route) => {
+      moduleRoutes.push(route)
+    })
+  }
+
+  return moduleRoutes
+}

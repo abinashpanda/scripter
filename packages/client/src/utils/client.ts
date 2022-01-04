@@ -6,4 +6,10 @@ export const apiClient = axios.create({
   baseURL: 'http://localhost:3000',
 })
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+})

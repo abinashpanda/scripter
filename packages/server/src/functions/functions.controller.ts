@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { ExecuteFunctionDto } from './functions.dto'
 import { FunctionsService } from './functions.service'
 
@@ -9,6 +9,11 @@ export class FunctionsController {
   @Get('routes')
   getRoutes() {
     return this.functionsService.getRoutes()
+  }
+
+  @Get('routes/:route')
+  getRoute(@Param('route') route: string) {
+    return this.functionsService.getRoute(route)
   }
 
   @Post('execute')

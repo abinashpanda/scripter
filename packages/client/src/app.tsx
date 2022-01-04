@@ -1,34 +1,12 @@
-import { Button, Layout, Menu, Result, Spin } from 'antd'
-import { FileTextOutlined, FolderOpenOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { Result, Spin } from 'antd'
 import { useQuery } from 'react-query'
-import { useCallback, useState } from 'react'
-import { Route } from '@scripter/core'
+import { Route, Routes } from 'react-router-dom'
 import { fetchFunctionRoutes } from './queries/functions'
+import AppShell from './components/app-shell'
+import FunctionDetail from './pages/function-detail'
 
 export default function App() {
   const { data, isLoading, isError } = useQuery(['function-routes'], fetchFunctionRoutes)
-
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-
-  const renderRoute = useCallback((route: Route) => {
-    if (route.type === 'function') {
-      return (
-        <Menu.Item key={route.route} icon={<FileTextOutlined />}>
-          {route.title}
-        </Menu.Item>
-      )
-    }
-
-    if (route.type === 'module') {
-      return (
-        <Menu.SubMenu key={route.route} icon={<FolderOpenOutlined />} title={route.title}>
-          {route.children.map(renderRoute)}
-        </Menu.SubMenu>
-      )
-    }
-
-    return null
-  }, [])
 
   if (isLoading) {
     return (
@@ -48,24 +26,11 @@ export default function App() {
 
   if (data) {
     return (
-      <Layout className="h-screen">
-        <Layout.Sider width={240} collapsible theme="dark" collapsed={sidebarCollapsed} trigger={null}>
-          <Menu mode="inline" theme="dark">
-            {data.map(renderRoute)}
-          </Menu>
-        </Layout.Sider>
-        <Layout>
-          <Layout.Header className="!bg-white border-b !px-4">
-            <Button
-              icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              type="ghost"
-              onClick={() => {
-                setSidebarCollapsed((prevState) => !prevState)
-              }}
-            />
-          </Layout.Header>
-        </Layout>
-      </Layout>
+      <AppShell routes={data}>
+        <Routes>
+          <Route path="functions/:route" element={<FunctionDetail />} />
+        </Routes>
+      </AppShell>
     )
   }
 
