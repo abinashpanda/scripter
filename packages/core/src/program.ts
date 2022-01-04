@@ -18,6 +18,17 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
     }
 
     export const routes = ${JSON.stringify(routes, null, 2)}
+
+    export const allRoutes = ${JSON.stringify(
+      functionRoutes.reduce((acc, route) => {
+        return {
+          ...acc,
+          [route.route]: route,
+        }
+      }, {}),
+      null,
+      2,
+    )}
   `
 
   return await esbuild.build({

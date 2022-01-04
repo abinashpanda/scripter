@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@scripter/configs": "*",
+    "@scripter/core": "*",
     "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
