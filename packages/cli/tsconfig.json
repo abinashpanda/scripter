@@ -1,0 +1,3 @@
+{
+  "extends": "@scripter/configs/tsconfig/core.json"
+}

@@ -4,8 +4,9 @@
   "description": "Build internal tools faster",
   "main": "index.js",
   "scripts": {
-    "test": "turbo run test",
-    "test:ci": "turbo run test:ci"
+    "test": "npm run test --workspaces --if-present",
+    "test:ci": "npm run test:ci --workspaces --if-present",
+    "dev:cli": "npm run dev --workspace=@scripter/cli"
   },
   "workspaces": [
     "packages/*"
@@ -16,6 +17,10 @@
   "dependencies": {
     "@types/node": "^17.0.5",
     "axios": "^0.24.0",
+    "chalk": "^4.1.2",
+    "chalk-animation": "^1.6.0",
+    "chokidar": "^3.5.2",
+    "commander": "^8.3.0",
     "esbuild": "^0.14.9",
     "jest": "^27.4.5",
     "lodash": "^4.17.21",
@@ -25,6 +30,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@types/chalk-animation": "^1.6.1",
     "@types/jest": "^27.4.0",
     "@types/lodash": "^4.14.178",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
@@ -37,22 +43,11 @@
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "ts-jest": "^27.1.2",
-    "turbo": "^1.0.24"
+    "ts-jest": "^27.1.2"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "turbo": {
-    "baseBranch": "origin/develop",
-    "pipeline": {
-      "dev": {
-        "cache": false
-      },
-      "test": {},
-      "test:ci": {}
     }
   }
 }

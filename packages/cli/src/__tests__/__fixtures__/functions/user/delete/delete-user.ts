@@ -6,6 +6,6 @@
  * @param userEmail email of the user
  */
 // eslint-disable-next-line
-const deleteUser = async (userEmail: string) => {}
+const deleteUser = async (userEmail: string, deleteAllData?: boolean) => {}
 
 export default deleteUser

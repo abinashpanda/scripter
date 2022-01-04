@@ -1,0 +1,13 @@
+{
+  "name": "@scripter/cli",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "@scripter/core": "*",
+    "@scripter/configs": "*"
+  },
+  "private": true
+}
