@@ -3,6 +3,7 @@
 /* eslint-disable no-console */
 
 import * as path from 'path'
+import { spawn } from 'child_process'
 import { Command } from 'commander'
 import { compile } from '@scripter/core'
 import chokidar from 'chokidar'
@@ -12,6 +13,31 @@ import chalk from 'chalk'
 function resolvePath(relpath: string) {
   // @TODO: Update the resolvePath to work correctly with the build data
   return path.resolve(__dirname, '../../..', relpath)
+}
+
+/**
+ * Start the server in watch mode for developement purpose.
+ *
+ * Right now, this function spawns a child process which runs the start:dev script
+ * in the server package and pass the output directory location to the server using environment variable
+ *
+ * @TODO: Move it to a robust way to start the process
+ * Right now I am not big fan of it. It looks very patchy and hacky, but it works.
+ * So!!!!!, it is what it is for now.
+ */
+function startServerInWatchMode(outputDir: string) {
+  const server = spawn('npm', ['run', 'start:dev'], {
+    cwd: path.resolve(__dirname, '../../server'),
+    env: { PATH: process.env.PATH, PORT: '3000', FUNCTIONS_OUTDIR: outputDir },
+  })
+  server.stdout.on('data', (data) => {
+    // remove additional new lines
+    console.log(Buffer.from(data).toString('utf-8').replace('\n', ''))
+  })
+  server.stderr.on('data', (data) => {
+    // remove additional new lines
+    console.error(Buffer.from(data).toString('utf-8').replace('\n', ''))
+  })
 }
 
 async function main() {
@@ -45,7 +71,9 @@ async function main() {
     }
   }
 
-  buildEverything()
+  await buildEverything()
+  startServerInWatchMode(outputDir)
+
   chokidar
     .watch(inputDir, {
       persistent: true,
