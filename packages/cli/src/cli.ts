@@ -10,10 +10,6 @@ import chokidar from 'chokidar'
 import gradientString from 'gradient-string'
 import chalk from 'chalk'
 
-function delay(duration) {
-  return new Promise((resolve) => setTimeout(resolve, duration))
-}
-
 function resolvePath(relpath: string) {
   // @TODO: Update the resolvePath to work correctly with the build data
   return path.resolve(__dirname, '../../..', relpath)
@@ -43,6 +39,22 @@ function startServerInWatchMode(outputDir: string) {
     console.error(Buffer.from(data).toString('utf-8').replace('\n', ''))
   })
   return server
+}
+
+function startClientInWatchMode() {
+  const client = spawn('npm', ['run', 'dev'], {
+    cwd: path.resolve(__dirname, '../../client'),
+    env: { PATH: process.env.PATH },
+  })
+  client.stdout.on('data', (data) => {
+    // remove additional new lines
+    console.log(Buffer.from(data).toString('utf-8').replace('\n', ''))
+  })
+  client.stderr.on('data', (data) => {
+    // remove additional new lines
+    console.error(Buffer.from(data).toString('utf-8').replace('\n', ''))
+  })
+  return client
 }
 
 async function main() {
@@ -78,6 +90,7 @@ async function main() {
 
   await buildEverything()
   startServerInWatchMode(outputDir)
+  startClientInWatchMode()
 
   chokidar
     .watch(inputDir, {
