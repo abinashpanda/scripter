@@ -2,20 +2,25 @@ import {
   createSourceFile,
   ScriptTarget,
   isFunctionDeclaration,
-  JSDocComment,
   isExportAssignment,
   isVariableStatement,
   SyntaxKind,
 } from 'typescript'
-import type { FunctionDeclaration, Identifier, ArrowFunction, FunctionExpression, ExportAssignment } from 'typescript'
+import type {
+  FunctionDeclaration,
+  Identifier,
+  ArrowFunction,
+  FunctionExpression,
+  ExportAssignment,
+  JSDocTag,
+  JSDocComment,
+} from 'typescript'
 import { upperFirst, words, lowerCase } from 'lodash'
 import { getParamData, getParamsMetaDataFromJSDoc } from './param'
 import type { ParamMeta, ParamWithDescription } from './param'
 import { isExportDefaultStatement } from './statement'
 
-function parseFunctionParams(functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression): {
-  params: ParamWithDescription[]
-} {
+function parseFunctionParams(functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression) {
   if (!functionDeclaration) {
     throw new Error('No default scripter function found')
   }
@@ -44,8 +49,28 @@ function parseFunctionParams(functionDeclaration: FunctionDeclaration | ArrowFun
     }
   }
 
+  return paramDescriptions
+}
+
+type FunctionMeta = {
+  title?: string
+  description?: string
+}
+
+function parseFunctionMetaFromDoc(doc: JSDocComment | undefined): FunctionMeta | undefined {
+  if (!doc) {
+    return undefined
+  }
+
+  // @ts-expect-error (as tags are not present in JSDocComment)
+  const tags = (doc.tags ?? []) as JSDocTag[]
+  const title = tags.find((tag) => tag.kind === SyntaxKind.JSDocTag && tag.tagName.escapedText === 'scripterTitle')
+    ?.comment as string | undefined
+  // @ts-expect-error (as comment field is not present in description)
+  const description = doc.comment as string | undefined
   return {
-    params: paramDescriptions,
+    title,
+    description,
   }
 }
 
@@ -56,6 +81,8 @@ export function parse(fileContent: string) {
   const { statements } = sourceFile
 
   let functionDeclaration: FunctionDeclaration | ArrowFunction | undefined
+
+  let meta: FunctionMeta | undefined
 
   // This assumes that the function is exported as default and there is a single default declaration
   // if there would be multiple default declarations, we still don't care about others because the code is invalid
@@ -73,10 +100,15 @@ export function parse(fileContent: string) {
     functionDeclaration = statements.find(
       (statement) => isFunctionDeclaration(statement) && statement.name?.escapedText === functionName,
     ) as FunctionDeclaration | undefined
+    if (functionDeclaration) {
+      // @ts-expect-error (jsDoc is not present in the FunctionDeclaration type definition)
+      meta = parseFunctionMetaFromDoc(functionDeclaration?.jsDoc?.[0])
+    }
 
     if (!functionDeclaration) {
       const variableStatements = statements.filter(isVariableStatement)
       for (const variableStatement of variableStatements) {
+        let functionDeclarationFound = false
         const {
           declarationList: { declarations },
         } = variableStatement
@@ -85,6 +117,7 @@ export function parse(fileContent: string) {
             const initializer = declaration.initializer
             if (initializer?.kind === SyntaxKind.ArrowFunction) {
               functionDeclaration = initializer as ArrowFunction
+              functionDeclarationFound = true
               break
             }
             if (initializer?.kind === SyntaxKind.FunctionExpression) {
@@ -92,9 +125,15 @@ export function parse(fileContent: string) {
               // because the are some fields present in ArrowFunction which are not present
               // in FunctionExpress and we don't care about those
               functionDeclaration = initializer as FunctionExpression
+              functionDeclarationFound = true
               break
             }
           }
+        }
+
+        if (functionDeclarationFound) {
+          // @ts-expect-error (jsDoc is not present in the variableStatement type definition)
+          meta = parseFunctionMetaFromDoc(variableStatement?.jsDoc?.[0])
         }
       }
     }
@@ -109,6 +148,10 @@ export function parse(fileContent: string) {
     functionDeclaration = statements.find(
       (statement) => isFunctionDeclaration(statement) && isExportDefaultStatement(statement),
     ) as FunctionDeclaration | undefined
+    if (functionDeclaration) {
+      // @ts-expect-error (jsDoc is not present in the FunctionDeclaration type definition)
+      meta = parseFunctionMetaFromDoc(functionDeclaration?.jsDoc?.[0])
+    }
   }
 
   /**
@@ -122,6 +165,8 @@ export function parse(fileContent: string) {
     )
     if (exportDefaultStatement) {
       functionDeclaration = (exportDefaultStatement as ExportAssignment).expression as ArrowFunction
+      // @ts-expect-error (jsDoc is not present in the ExportAssignment type definition)
+      meta = parseFunctionMetaFromDoc(exportDefaultStatement?.jsDoc?.[0])
     }
   }
 
@@ -129,5 +174,6 @@ export function parse(fileContent: string) {
     throw new Error('No default scripter function found')
   }
 
-  return parseFunctionParams(functionDeclaration)
+  const params = parseFunctionParams(functionDeclaration)
+  return { params, meta }
 }

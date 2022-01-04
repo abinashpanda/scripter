@@ -19,6 +19,7 @@ describe('compiler', () => {
         type: 'function',
         title: 'Ping',
         route: 'ping',
+        description: undefined,
         params: [
           {
             identifier: 'name',
@@ -33,6 +34,7 @@ describe('compiler', () => {
         type: 'function',
         title: 'Sum',
         route: 'sum',
+        description: undefined,
         params: [
           {
             identifier: 'first',
@@ -67,6 +69,7 @@ describe('compiler', () => {
             type: 'function',
             title: 'Fetch all users',
             route: 'user/fetch-all-users',
+            description: undefined,
             params: [
               {
                 identifier: 'id',
@@ -102,6 +105,7 @@ describe('compiler', () => {
             type: 'function',
             title: 'Fetch user by email',
             route: 'user/fetch-user-by-email',
+            description: undefined,
             params: [
               {
                 identifier: 'email',
@@ -119,7 +123,8 @@ describe('compiler', () => {
             children: [
               {
                 type: 'function',
-                title: 'Delete user',
+                title: 'Delete User from Database',
+                description: 'Completely delete user from the database and inform them on their email',
                 route: 'user/delete/delete-user',
                 params: [
                   {
@@ -128,6 +133,13 @@ describe('compiler', () => {
                     meta: {},
                     required: true,
                     type: 'string',
+                  },
+                  {
+                    identifier: 'deleteUserFromDb',
+                    label: ': Permanently delete user',
+                    meta: {},
+                    required: false,
+                    type: 'boolean',
                   },
                 ],
               },

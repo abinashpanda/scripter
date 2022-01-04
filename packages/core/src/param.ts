@@ -15,6 +15,11 @@ export type NumberParam = {
   }
 }
 
+export type BooleanParam = {
+  type: 'boolean'
+  meta: {}
+}
+
 export type DateParam = {
   type: 'date'
   meta: {
@@ -23,7 +28,7 @@ export type DateParam = {
   }
 }
 
-export type Param = StringParam | NumberParam | DateParam
+export type Param = StringParam | NumberParam | DateParam | BooleanParam
 
 export type ParamWithDescription = Param & {
   identifier: string
@@ -70,6 +75,13 @@ export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Para
         minValue: meta.minValue ? Number.parseFloat(meta.minValue) : undefined,
         step: meta.step ? Number.parseFloat(meta.step) : undefined,
       },
+    }
+  }
+
+  if (param.type?.kind === SyntaxKind.BooleanKeyword) {
+    return {
+      type: 'boolean',
+      meta: {},
     }
   }
 

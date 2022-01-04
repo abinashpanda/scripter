@@ -6,7 +6,7 @@ import * as path from 'path'
 import { Command } from 'commander'
 import { compile } from '@scripter/core'
 import chokidar from 'chokidar'
-import chalkAnimation from 'chalk-animation'
+import gradientString from 'gradient-string'
 import chalk from 'chalk'
 
 function resolvePath(relpath: string) {
@@ -14,16 +14,13 @@ function resolvePath(relpath: string) {
   return path.resolve(__dirname, '../../..', relpath)
 }
 
-function delay(duration: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, duration)
-  })
-}
-
 async function main() {
-  const anim = chalkAnimation.rainbow('\n SCRIPTER \n')
-  await delay(1000)
-  anim.stop()
+  console.log(
+    gradientString([
+      { r: 255, g: 0, b: 125 },
+      { r: 125, g: 0, b: 255 },
+    ])('\n💻 SCRIPTER\n'),
+  )
 
   const program = new Command()
 
@@ -39,7 +36,7 @@ async function main() {
   const outputDir = resolvePath(output)
 
   async function buildEverything() {
-    console.log(chalk.green('⌛ building...'))
+    console.log(chalk.blue('⌛ building...'))
     try {
       await compile(inputDir, outputDir)
       console.log(chalk.green('✅ build successfull'))
@@ -60,7 +57,13 @@ async function main() {
     })
     // @TODO: Handle error
     .on('error', () => {})
-    .on('change', buildEverything)
+    .on('change', (fileChanged) => {
+      // get the file path from the rootDir
+      const filePath = fileChanged.replace(inputDir.endsWith('/') ? inputDir : `${inputDir}/`, '')
+      console.log(chalk.blue(`📖 ${filePath} updated`))
+
+      buildEverything()
+    })
 }
 
 main()
