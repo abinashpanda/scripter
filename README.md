@@ -4,68 +4,30 @@
 
 ## Getting Started
 
-### Project Structure
-
-```
-package.json
-package-lock.json
-src
-  - functions
-    - fetch-user-by-email.ts
-    - search-users.ts
-  - config
-    - client.ts
-    - server.ts
-```
-
 #### Scripts
 
+Temporary dev script to run the CLI
+
 ```
-npm start
+npm run dev:cli -- -- --functions packages/cli/src/__tests__/__fixtures__/functions --output build
 ```
 
 ### Writing functions
 
 ```ts
-/* functions/search-user-by-email.ts */
-import axios from 'axios'
-
-export const description = {
-  title: 'Fetch User',
-  description: 'Fetch user for a corresponding email',
-}
-
-export default async function fetchUserByEmail(email: string) {
-  const { data } = await axios.get<User>(`/users?email=${email}`)
-  if (data) {
-    return data[0]
-  }
-  return undefined
-}
-```
-
-```ts
-/* functions/search-users.ts */
-import type { DateRange } from '@scripter/core'
-
-export const description = {
-  title: 'Search Users',
-  description: 'Search users from database',
-}
-
-export default async function searchUsers(
-  firstName?: string,
-  lastName?: string,
-  /** @scripterParam "Registered during" */ dateRange?: DateRange,
+/**
+ * Subtract two numbers
+ *
+ * @scripterTitle Subtract
+ */
+export default function diff(
+  /** @scripterParam First Number */ first: number,
+  /** @scripterParam Second Number */ second: number,
 ) {
-  const { data } = await axios.get<User>(`/users`, {
-    params: {
-      firstName,
-      lastName,
-      startDate: dateRange ? dateRange[0].toISOString() : undefined,
-      endDate: dateRange ? dateRange[1].toISOString() : undefined,
-    },
-  })
-  return data
+  return first - second
 }
 ```
+
+This function would render a UI like
+
+<img src="./assets/screenshot.png" />
