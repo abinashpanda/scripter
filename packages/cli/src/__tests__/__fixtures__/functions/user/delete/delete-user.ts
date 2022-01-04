@@ -1,7 +1,7 @@
 /**
  * Completely delete user from the database and inform them on their email
  *
- * @scripterTitle - Delete User from Database
+ * @scripterTitle Delete User Permanently
  *
  * @param userEmail email of the user
  */

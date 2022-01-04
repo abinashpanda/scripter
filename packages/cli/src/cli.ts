@@ -10,6 +10,10 @@ import chokidar from 'chokidar'
 import gradientString from 'gradient-string'
 import chalk from 'chalk'
 
+function delay(duration) {
+  return new Promise((resolve) => setTimeout(resolve, duration))
+}
+
 function resolvePath(relpath: string) {
   // @TODO: Update the resolvePath to work correctly with the build data
   return path.resolve(__dirname, '../../..', relpath)
@@ -38,6 +42,7 @@ function startServerInWatchMode(outputDir: string) {
     // remove additional new lines
     console.error(Buffer.from(data).toString('utf-8').replace('\n', ''))
   })
+  return server
 }
 
 async function main() {
@@ -85,12 +90,12 @@ async function main() {
     })
     // @TODO: Handle error
     .on('error', () => {})
-    .on('change', (fileChanged) => {
+    .on('change', async (fileChanged) => {
       // get the file path from the rootDir
       const filePath = fileChanged.replace(inputDir.endsWith('/') ? inputDir : `${inputDir}/`, '')
       console.log(chalk.blue(`📖 ${filePath} updated`))
 
-      buildEverything()
+      await buildEverything()
     })
 }
 

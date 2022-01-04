@@ -16,6 +16,8 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
     export const functions = {
       ${functionRoutes.map((functionRoute) => `${getRouteVariable(functionRoute.route)},`).join('\n')}
     }
+
+    export const routes = ${JSON.stringify(routes, null, 2)}
   `
 
   return await esbuild.build({
