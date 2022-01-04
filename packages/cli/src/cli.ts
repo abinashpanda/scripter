@@ -95,7 +95,7 @@ async function main() {
 
   // @TODO: Move all the ports to environment variables
   const ws = new WebSocket.Server({ port: 3002 })
-  function broadcast(message: { event: string }) {
+  function broadcast(message: { type: string }) {
     ws.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(message))
@@ -121,7 +121,7 @@ async function main() {
 
       await buildEverything()
 
-      broadcast({ event: 'RELOAD' })
+      broadcast({ type: 'RELOAD' })
     })
 }
 
