@@ -8,6 +8,7 @@ import { users } from '../data/users'
  * @param height Height
  */
 export default function fetchAllUsers(
+  /** @scripterParam User id */
   // eslint-disable-next-line
   id: string,
   // eslint-disable-next-line

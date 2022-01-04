@@ -1,6 +1,7 @@
-import { Result, Spin } from 'antd'
+import { Empty, Result, Spin } from 'antd'
 import { useQuery } from 'react-query'
 import { useMatch } from 'react-router-dom'
+import Form from '../../components/form'
 import { fetchFunctionFromRoute } from '../../queries/functions'
 
 export default function FunctionDetail() {
@@ -29,10 +30,16 @@ export default function FunctionDetail() {
 
   if (data) {
     return (
-      <div className="max-w-screen-lg p-4 mx-auto bg-white border rounded-md">
-        <div className="text-lg font-medium">{data.title}</div>
-        <div className="mb-2">{data.description}</div>
-        <hr className="mb-4 -mx-4" />
+      <div className="max-w-screen-lg mx-auto space-y-4">
+        <div className="p-4 bg-white border rounded-md">
+          <div className="text-lg font-medium">{data.title}</div>
+          <div className="mb-2">{data.description}</div>
+          <hr className="mb-4 -mx-4" />
+          <Form params={data.params} />
+        </div>
+        <div className="p-4 bg-white border rounded-md">
+          <Empty description="Run the function to see result" />
+        </div>
       </div>
     )
   }

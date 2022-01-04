@@ -9,7 +9,7 @@ const deleteUser = async (
   // eslint-disable-next-line
   userEmail: string,
   // eslint-disable-next-line
-  /** @scripterParam: Permanently delete user */ deleteUserFromDb?: boolean,
+  /** @scripterParam Permanently delete user */ deleteUserFromDb?: boolean,
 ) => {}
 
 export default deleteUser
