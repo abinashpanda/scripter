@@ -9,7 +9,7 @@
 Temporary dev script to run the CLI
 
 ```
-npm run dev:cli -- -- --functions packages/cli/src/__tests__/__fixtures__/functions --output build
+npm run dev:cli
 ```
 
 ### Writing functions
