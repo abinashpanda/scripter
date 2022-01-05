@@ -42,15 +42,19 @@ async function compileRoutes(rootDirPath: string, rootDirName?: string) {
     const fileName = file.replace('.ts', '')
     const fileContent = await fs.readFile(path.resolve(rootDirPath, file), 'utf-8')
 
-    const { params, meta } = parse(fileContent)
+    try {
+      const { params, meta } = parse(fileContent)
 
-    routes.push({
-      type: 'function',
-      route: resolveRoute(fileName, rootDirName),
-      title: meta?.title ?? getRouteTitle(fileName),
-      description: meta?.description,
-      params,
-    })
+      routes.push({
+        type: 'function',
+        route: resolveRoute(fileName, rootDirName),
+        title: meta?.title ?? getRouteTitle(fileName),
+        description: meta?.description,
+        params,
+      })
+    } catch (error) {
+      // skip parsing
+    }
   }
 
   for (const folder of folders) {

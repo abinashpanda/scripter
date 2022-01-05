@@ -103,6 +103,16 @@ async function main() {
     })
   }
 
+  async function handleFileChange(fileChanged: string, operation: string) {
+    // get the file path from the rootDir
+    const filePath = fileChanged.replace(inputDir.endsWith('/') ? inputDir : `${inputDir}/`, '')
+    console.log(chalk.blue(`📖 ${filePath} ${operation}`))
+
+    await buildEverything()
+
+    broadcast({ type: 'RELOAD' })
+  }
+
   chokidar
     .watch(inputDir, {
       persistent: true,
@@ -114,15 +124,9 @@ async function main() {
     })
     // @TODO: Handle error
     .on('error', () => {})
-    .on('change', async (fileChanged) => {
-      // get the file path from the rootDir
-      const filePath = fileChanged.replace(inputDir.endsWith('/') ? inputDir : `${inputDir}/`, '')
-      console.log(chalk.blue(`📖 ${filePath} updated`))
-
-      await buildEverything()
-
-      broadcast({ type: 'RELOAD' })
-    })
+    .on('change', (file) => handleFileChange(file, 'updated'))
+    .on('add', (file) => handleFileChange(file, 'added'))
+    .on('unlink', (file) => handleFileChange(file, 'deleted'))
 }
 
 main()
