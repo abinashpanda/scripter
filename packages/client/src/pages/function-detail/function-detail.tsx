@@ -1,8 +1,11 @@
-import { Empty, Result, Spin } from 'antd'
-import { useQuery } from 'react-query'
+import { Result, Spin } from 'antd'
+import { AxiosError } from 'axios'
+import { useCallback, useEffect } from 'react'
+import { useMutation, useQuery } from 'react-query'
 import { useMatch } from 'react-router-dom'
 import Form from '../../components/form'
-import { fetchFunctionFromRoute } from '../../queries/functions'
+import { executeFunction, fetchFunctionFromRoute } from '../../queries/functions'
+import ExecutionResult from './components/execution-result'
 
 export default function FunctionDetail() {
   const match = useMatch('functions/:route')
@@ -11,6 +14,28 @@ export default function FunctionDetail() {
   const { data, isLoading, isError } = useQuery(['function-routes', route], () => fetchFunctionFromRoute(route), {
     enabled: !!route,
   })
+
+  const {
+    isLoading: isExecuting,
+    data: executionResult,
+    mutate: executeFunctionMutation,
+    error: executionError,
+    reset,
+  } = useMutation((data) => executeFunction({ route, data }))
+
+  useEffect(
+    function resetExecutionResultOnRouteChange() {
+      reset()
+    },
+    [route, reset],
+  )
+
+  const handleSubmit = useCallback(
+    (data: any) => {
+      executeFunctionMutation(data)
+    },
+    [executeFunctionMutation],
+  )
 
   if (isLoading) {
     return (
@@ -35,10 +60,16 @@ export default function FunctionDetail() {
           <div className="text-lg font-medium">{data.title}</div>
           <div className="mb-2">{data.description}</div>
           <hr className="mb-4 -mx-4" />
-          <Form params={data.params} />
+          <Form params={data.params} onSubmit={handleSubmit} submitting={isExecuting} />
         </div>
-        <div className="p-4 bg-white border rounded-md">
-          <Empty description="Run the function to see result" />
+        <div className="p-4 bg-white border rounded-md" key={route}>
+          <ExecutionResult
+            key={route}
+            functionTitle={data.title}
+            isExecuting={isExecuting}
+            executionError={executionError as AxiosError<{ message: string; stack: string }>}
+            executionResult={executionResult}
+          />
         </div>
       </div>
     )

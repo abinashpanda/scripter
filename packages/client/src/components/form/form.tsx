@@ -12,11 +12,13 @@ function isRule(rule: any): rule is Rule {
 
 type FormProps = {
   params: ParamWithDescription[]
+  onSubmit?: (data: any) => void
+  submitting?: boolean
   className?: string
   style?: React.CSSProperties
 }
 
-export default function Form({ params, className, style }: FormProps) {
+export default function Form({ params, onSubmit, submitting, className, style }: FormProps) {
   const [form] = AntdForm.useForm()
 
   const renderParam = useCallback((param: ParamWithDescription) => {
@@ -107,10 +109,10 @@ export default function Form({ params, className, style }: FormProps) {
   }, [])
 
   return (
-    <AntdForm className={className} style={style} layout="vertical" form={form}>
+    <AntdForm className={className} style={style} layout="vertical" form={form} onFinish={onSubmit}>
       {params.map(renderParam)}
       <div className="flex items-center space-x-4">
-        <Button type="primary" htmlType="submit" icon={<CheckOutlined />}>
+        <Button type="primary" htmlType="submit" icon={<CheckOutlined />} loading={submitting}>
           Submit
         </Button>
         <Button htmlType="reset" icon={<ClearOutlined />}>

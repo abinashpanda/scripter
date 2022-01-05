@@ -1,8 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import type { FunctionRoute, Route } from '@scripter/core'
+import { words } from 'lodash'
 import { ExecuteFunctionDto } from './functions.dto'
 
 const FUNCTIONS_OUTDIR = process.env.FUNCTIONS_OUTDIR as string
+
+// @TODO: import this function from @scripter/core
+function getRouteVariable(route: string) {
+  return words(route).join('_')
+}
 
 function importFunctions() {
   const routes = require(FUNCTIONS_OUTDIR)
@@ -46,8 +52,10 @@ export class FunctionsService {
   async executeFunction(executeFunctionDto: ExecuteFunctionDto) {
     const { route, data } = executeFunctionDto
     const functions = importFunctions()
-    const functionToExecute = functions.functions[route]
-    const functionParams = functions.allRoutes[route]
+    const formattedRoute = route.replace(/~/g, '/')
+    const functionVariableName = getRouteVariable(formattedRoute)
+    const functionToExecute = functions.functions[functionVariableName]
+    const functionParams = functions.allRoutes[formattedRoute]
     if (!functionToExecute || !functionParams) {
       throw new NotFoundException(`No function found for route ${route} found. Please check your functions directory`)
     }
