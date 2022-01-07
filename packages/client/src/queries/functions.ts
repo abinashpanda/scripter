@@ -1,4 +1,4 @@
-import { FunctionRoute, Route } from '@scripter/core'
+import type { FunctionRoute, Route } from '@scripter/core'
 import { apiClient } from '../utils/client'
 
 export async function fetchFunctionRoutes() {

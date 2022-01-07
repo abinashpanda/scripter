@@ -1,5 +1,5 @@
 import { Button, Form as AntdForm, Input, InputNumber, Slider, Switch } from 'antd'
-import { ParamWithDescription } from '@scripter/core'
+import type { ParamWithDescription } from '@scripter/core'
 import { useCallback } from 'react'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'

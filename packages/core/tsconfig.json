@@ -1,7 +1,6 @@
 {
   "extends": "@scripter/configs/tsconfig/base.json",
   "compilerOptions": {
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   }
 }

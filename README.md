@@ -9,7 +9,7 @@
 Temporary dev script to run the CLI
 
 ```
-npm run dev:cli
+yarn dev:cli
 ```
 
 ### Writing functions

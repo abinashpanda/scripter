@@ -3,3 +3,6 @@ node_modules
 .turbo
 
 build
+
+# yarn logs
+yarn-error.log

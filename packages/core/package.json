@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "main": "src/index.ts",
-  "scripts": {
-    "test": "jest --watch --verbose",
-    "test:ci": "jest --verbose"
-  },
+  "scripts": {},
   "devDependencies": {
     "@scripter/configs": "*"
   },
-  "jest": {
-    "preset": "@scripter/configs/jest/node"
+  "dependencies": {
+    "esbuild": "^0.14.10",
+    "typescript": "^4.5.4"
   }
 }

@@ -27,7 +27,7 @@ function resolvePath(relpath: string) {
  * So!!!!!, it is what it is for now.
  */
 function startServerInWatchMode(outputDir: string) {
-  const server = spawn('npm', ['run', 'start:dev'], {
+  const server = spawn('yarn', ['start:dev'], {
     cwd: path.resolve(__dirname, '../../server'),
     env: { PATH: process.env.PATH, PORT: '3000', FUNCTIONS_OUTDIR: outputDir },
   })
@@ -43,7 +43,7 @@ function startServerInWatchMode(outputDir: string) {
 }
 
 function startClientInWatchMode() {
-  const client = spawn('npm', ['run', 'dev'], {
+  const client = spawn('yarn', ['dev'], {
     cwd: path.resolve(__dirname, '../../client'),
     env: { PATH: process.env.PATH },
   })
