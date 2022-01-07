@@ -6,8 +6,7 @@
   "scripts": {
     "test": "npm run test --workspaces --if-present",
     "test:ci": "npm run test:ci --workspaces --if-present",
-    "dev:cli": "npm run dev --workspace=@scripter/cli -- --functions functions --output build",
-    "start:server:dev": "npm run start:dev --workspace=@scripter/server"
+    "dev:cli": "npm run dev --workspace=@scripter/cli -- --functions functions --output build"
   },
   "workspaces": [
     "packages/*"

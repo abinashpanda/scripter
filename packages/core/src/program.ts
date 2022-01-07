@@ -40,5 +40,6 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
     logLevel: 'silent',
     outfile: path.resolve(outputDir, 'index.js'),
     bundle: true,
+    platform: 'node',
   })
 }
