@@ -7,6 +7,8 @@ module.exports = {
   modulePathIgnorePatterns: [
     '<rootDir>/node_modules',
     '<rootDir>/dist',
+    '<rootDir>/packages/core/build',
+    '<rootDir>/packages/core/esm-build',
     '<rootDir>/packages/core/src/__tests__/__fixtures__',
   ],
   preset: 'ts-jest',

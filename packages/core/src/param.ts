@@ -1,5 +1,5 @@
 import type { JSDocTag, JSDocComment, ParameterDeclaration, Identifier } from 'typescript'
-import { SyntaxKind } from 'typescript'
+import * as ts from 'typescript'
 
 export type StringParam = {
   type: 'string'
@@ -52,7 +52,7 @@ export function getParamsMetaDataFromJSDoc(jsDocs: JSDocComment[]): ParamMeta {
 }
 
 export function isDateParam(param: ParameterDeclaration): boolean {
-  if (param.type?.kind !== SyntaxKind.TypeReference) {
+  if (param.type?.kind !== ts.SyntaxKind.TypeReference) {
     return false
   }
   // @ts-ignore
@@ -60,14 +60,14 @@ export function isDateParam(param: ParameterDeclaration): boolean {
 }
 
 export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Param | undefined {
-  if (param.type?.kind === SyntaxKind.StringKeyword) {
+  if (param.type?.kind === ts.SyntaxKind.StringKeyword) {
     return {
       type: 'string',
       meta: {},
     }
   }
 
-  if (param.type?.kind === SyntaxKind.NumberKeyword) {
+  if (param.type?.kind === ts.SyntaxKind.NumberKeyword) {
     return {
       type: 'number',
       meta: {
@@ -78,7 +78,7 @@ export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Para
     }
   }
 
-  if (param.type?.kind === SyntaxKind.BooleanKeyword) {
+  if (param.type?.kind === ts.SyntaxKind.BooleanKeyword) {
     return {
       type: 'boolean',
       meta: {},

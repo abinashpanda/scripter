@@ -1,11 +1,12 @@
 import * as path from 'path'
-import * as esbuild from 'esbuild'
 import type { Route } from './route'
 import { getRouteVariable, getFunctionRoutes } from './route'
 
 export type Program = void
 
 export async function compileProgram(rootDir: string, outputDir: string, routes: Route[]) {
+  const esbuild = require('esbuild')
+
   const functionRoutes = getFunctionRoutes(routes)
   // import all the functions in the entryFile and export all the named imports using functions variable
   const entryFile = `

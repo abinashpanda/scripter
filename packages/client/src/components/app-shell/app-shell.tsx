@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button, Layout, Menu } from 'antd'
 import type { Route } from '@scripter/core'
+import { getFunctionRoutes, getModuleRoutes } from '@scripter/core'
 import {
   FileTextOutlined,
   FolderOpenOutlined,
@@ -9,7 +10,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons'
 import { useMatch, useNavigate } from 'react-router-dom'
-import { formatRoute, getFunctionRoutes, getModuleRoutes } from '../../utils/route'
+import { formatRoute } from '../../utils/route'
 
 type AppShellProps = {
   routes: Route[]

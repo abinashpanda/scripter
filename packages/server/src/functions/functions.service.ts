@@ -1,14 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { getRouteVariable } from '@scripter/core'
 import type { FunctionRoute, Route } from '@scripter/core'
-import { words } from 'lodash'
 import { ExecuteFunctionDto } from './functions.dto'
 
 const FUNCTIONS_OUTDIR = process.env.FUNCTIONS_OUTDIR as string
-
-// @TODO: import this function from @scripter/core
-function getRouteVariable(route: string) {
-  return words(route).join('_')
-}
 
 function importFunctions() {
   const routes = require(FUNCTIONS_OUTDIR)

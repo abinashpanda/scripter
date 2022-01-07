@@ -1,8 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
+    "target": "ESNext",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,

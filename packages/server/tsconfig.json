@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": "./",
+    "module": "CommonJS",
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   }
