@@ -5,8 +5,8 @@
   "scripts": {
     "test": "jest --verbose --watch",
     "test:ci": "jest --verbose",
-    "predev:cli": "yarn workspace @scripter/core build",
-    "dev:cli": "yarn workspace @scripter/cli dev --functions functions --output build"
+    "predev": "yarn workspace @scripter/core build",
+    "dev": "yarn workspace @scripter/cli dev"
   },
   "private": true,
   "workspaces": [

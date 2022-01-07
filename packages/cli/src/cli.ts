@@ -69,13 +69,13 @@ async function main() {
   const program = new Command()
 
   program
-    .requiredOption('-f, --functions <path>', 'root directory containing the functions')
-    .requiredOption('-o, --output <path>', 'build directory')
+    .option('-f, --functions <path>', 'root directory containing the functions')
+    .option('-o, --output <path>', 'build directory')
 
   program.parse(process.argv)
 
   const options = program.opts<{ functions: string; output: string }>()
-  const { functions, output } = options
+  const { functions = 'functions', output = 'build' } = options
   const inputDir = resolvePath(functions)
   const outputDir = resolvePath(output)
 
