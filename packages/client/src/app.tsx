@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom'
 import { fetchFunctionRoutes } from './queries/functions'
 import AppShell from './components/app-shell'
 import FunctionDetail from './pages/function-detail'
+import Home from './pages/home'
 
 export default function App() {
   const { data, isLoading, isError } = useQuery(['function-routes'], fetchFunctionRoutes)
@@ -28,6 +29,7 @@ export default function App() {
     return (
       <AppShell routes={data}>
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="functions/:route" element={<FunctionDetail />} />
         </Routes>
       </AppShell>

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Button, Layout, Menu } from 'antd'
 import type { Route } from '@scripter/core'
-import { getFunctionRoutes, getModuleRoutes } from '@scripter/core'
+import { getModuleRoutes } from '@scripter/core'
 import {
   FileTextOutlined,
   FolderOpenOutlined,
@@ -23,20 +23,6 @@ export default function AppShell({ routes, children }: AppShellProps) {
   const routeSelected = match?.params?.route
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-
-  useEffect(
-    function redirectUserToFirstRoute() {
-      if (!routeSelected) {
-        const functionRoutes = getFunctionRoutes(routes)
-        if (functionRoutes.length > 0) {
-          navigate(`functions/${formatRoute(functionRoutes[0].route)}`)
-        }
-      }
-    },
-    // we only want to run it for the first time, so didn't pass routes param
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  )
 
   const renderRoute = useCallback((route: Route) => {
     if (route.type === 'function') {
