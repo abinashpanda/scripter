@@ -527,5 +527,88 @@ describe('parser', () => {
         ],
       })
     })
+
+    it('parses nested type params correctly', () => {
+      const input = `
+      type StateInformation = {
+        state: string
+        country: string
+        pincode: number
+      }
+
+      type Address = {
+        addressLine1: string
+        addressLine2?: string
+        stateInformation: StateInformation
+      }
+      
+      export default function createUser(
+        firstName: string,
+        lastName: string,
+        email: string,
+        address: Address,
+        dateOfBirth: Date,
+      ) {}
+      `
+
+      const { params } = parse(input)
+      expect(params[3]).toEqual({
+        identifier: 'address',
+        label: 'Address',
+        required: true,
+        type: 'type',
+        meta: {},
+        children: [
+          {
+            identifier: 'addressLine1',
+            label: 'Address line 1',
+            required: true,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'addressLine2',
+            label: 'Address line 2',
+            required: false,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'stateInformation',
+            label: 'State information',
+            type: 'type',
+            meta: {},
+            required: true,
+            children: [
+              {
+                identifier: 'state',
+                label: 'State',
+                required: true,
+                type: 'string',
+                meta: {},
+              },
+              {
+                identifier: 'country',
+                label: 'Country',
+                required: true,
+                type: 'string',
+                meta: {},
+              },
+              {
+                identifier: 'pincode',
+                label: 'Pincode',
+                required: true,
+                type: 'number',
+                meta: {
+                  maxValue: undefined,
+                  minValue: undefined,
+                  step: undefined,
+                },
+              },
+            ],
+          },
+        ],
+      })
+    })
   })
 })
