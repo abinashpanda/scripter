@@ -19,8 +19,8 @@ import type {
   TypeAliasDeclaration,
   InterfaceDeclaration,
 } from 'typescript'
-import { getParamData, getParamsMetaDataFromJSDoc } from './param'
-import type { ParamMeta, ParamWithDescription } from './param'
+import { getParamData } from './param'
+import type { ParamWithDescription } from './param'
 import { isExportDefaultStatement } from './statement'
 
 function parseFunctionParams(
@@ -35,9 +35,7 @@ function parseFunctionParams(
   const paramDescriptions: ParamWithDescription[] = []
 
   for (const param of functionDeclaration.parameters) {
-    const jsDoc = (param as any).jsDoc as JSDocComment[] | undefined
-    const meta: ParamMeta = jsDoc ? getParamsMetaDataFromJSDoc(jsDoc) : {}
-    const paramData = getParamData(param, meta, typeAliases, interfaces)
+    const paramData = getParamData(param, typeAliases, interfaces)
 
     if (paramData) {
       paramDescriptions.push(paramData)

@@ -138,7 +138,7 @@ export default function Form({ params, onSubmit, submitting, className, style }:
 
       case 'type': {
         return (
-          <div className="px-4 py-2 mb-4 bg-opacity-25 border rounded-md bg-gray-50" key={paramIdentifier}>
+          <div className="px-4 py-2 mb-4 border rounded-md shadow-inner" key={paramIdentifier}>
             <div className="mb-2 font-medium">{label}</div>
             {param.children.map((childParam) => renderParam(childParam, paramIdentifier))}
           </div>

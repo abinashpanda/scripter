@@ -70,15 +70,18 @@ export function getParamsMetaDataFromJSDoc(jsDocs: JSDocComment[]): ParamMeta {
 
 export function getParamData(
   param: ParameterDeclaration | ts.PropertySignature,
-  meta: ParamMeta,
   typeAliases: TypeAliasDeclaration[],
   interfaces: InterfaceDeclaration[],
 ): ParamWithDescription | undefined {
+  const jsDoc = (param as any).jsDoc as JSDocComment[] | undefined
+  const meta: ParamMeta = jsDoc ? getParamsMetaDataFromJSDoc(jsDoc) : {}
+
   const identifier = (param.name as Identifier).escapedText as string
   const label =
     meta.scripterParam ??
     // if no scripterParam is specified, convert the identifier to a label by splitting words and joining with a space
     upperFirst(words(identifier).map(lowerCase).join(' '))
+
   const required = !param.questionToken
 
   if (param.type?.kind === ts.SyntaxKind.StringKeyword) {
@@ -147,7 +150,10 @@ export function getParamData(
         throw new Error(`No type definition for ${identifierName} found`)
       }
 
-      const paramData: TypeParam = {
+      const paramData: ParamWithDescription = {
+        identifier,
+        label,
+        required,
         type: 'type',
         meta: {},
         children: [],
@@ -160,19 +166,14 @@ export function getParamData(
       for (const member of members) {
         if (member.kind === ts.SyntaxKind.PropertySignature) {
           const property = member as PropertySignature
-          const paramDataForMember = getParamData(property, meta, typeAliases, interfaces)
+          const paramDataForMember = getParamData(property, typeAliases, interfaces)
           if (paramDataForMember) {
             paramData.children.push(paramDataForMember)
           }
         }
       }
 
-      return {
-        identifier,
-        label,
-        required,
-        ...paramData,
-      }
+      return paramData
     }
   }
 

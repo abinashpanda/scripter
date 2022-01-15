@@ -480,6 +480,7 @@ describe('parser', () => {
     it('parses type definitions from interfaces correctly', () => {
       const input = `
       interface PhoneNumber {
+        /** @scripterParam Extension (assume + is already added, just enter the extension) */
         extension: number
         phoneNumber: number
       }
@@ -504,7 +505,7 @@ describe('parser', () => {
         children: [
           {
             identifier: 'extension',
-            label: 'Extension',
+            label: 'Extension (assume + is already added, just enter the extension)',
             type: 'number',
             required: true,
             meta: {

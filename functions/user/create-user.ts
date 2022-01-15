@@ -1,12 +1,17 @@
-type Address = {
-  addressLine1: string
-  addressLine2: string
+type StateInformation = {
   state: string
   country: string
   pincode: number
 }
 
+type Address = {
+  addressLine1: string
+  addressLine2: string
+  stateInformation: StateInformation
+}
+
 interface PhoneNumber {
+  /** @scripterParam Extension (assume + is already added, just enter the extension) */
   extension: number
   phoneNumber: number
 }
