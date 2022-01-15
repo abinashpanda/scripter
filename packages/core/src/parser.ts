@@ -16,34 +16,9 @@ import type {
   ExportAssignment,
   JSDocTag,
   JSDocComment,
-  TypeAliasDeclaration,
-  InterfaceDeclaration,
 } from 'typescript'
 import { getParamData } from './param'
-import type { ParamWithDescription } from './param'
 import { isExportDefaultStatement } from './statement'
-
-function parseFunctionParams(
-  functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression,
-  typeAliases: TypeAliasDeclaration[],
-  interfaces: InterfaceDeclaration[],
-) {
-  if (!functionDeclaration) {
-    throw new Error('No default scripter function found')
-  }
-
-  const paramDescriptions: ParamWithDescription[] = []
-
-  for (const param of functionDeclaration.parameters) {
-    const paramData = getParamData(param, typeAliases, interfaces)
-
-    if (paramData) {
-      paramDescriptions.push(paramData)
-    }
-  }
-
-  return paramDescriptions
-}
 
 type FunctionMeta = {
   title?: string
@@ -73,8 +48,13 @@ export function parse(fileContent: string) {
 
   const { statements } = sourceFile
 
-  let functionDeclaration: FunctionDeclaration | ArrowFunction | undefined
+  // sometimes the parameters of the function would depend on some of the type definitions (and interfaces)
+  // defined in the file
+  // in this version of scripter we won't support type unions (as we won't be sure to show the type of the UI for it), so we can't handle this case
+  const typeAliases = statements.filter(isTypeAliasDeclaration)
+  const interfaces = statements.filter(isInterfaceDeclaration)
 
+  let functionDeclaration: FunctionDeclaration | ArrowFunction | undefined
   let meta: FunctionMeta | undefined
 
   // This assumes that the function is exported as default and there is a single default declaration
@@ -99,24 +79,35 @@ export function parse(fileContent: string) {
     }
 
     if (!functionDeclaration) {
+      // this means that we have that we have to look for variable declarations which are assigned to the export default
+      // and once we found a matching one, we to look for the function expression assigned to it
       const variableStatements = statements.filter(isVariableStatement)
+
       for (const variableStatement of variableStatements) {
         let functionDeclarationFound = false
+
         const {
           declarationList: { declarations },
         } = variableStatement
+
         for (const declaration of declarations) {
+          // check if the variable declaration is assigned to the export default
           if ((declaration.name as Identifier).escapedText === functionName) {
             const initializer = declaration.initializer
+            // then check if the initializer is a function expression
+
+            // first check for arrow function
             if (initializer?.kind === SyntaxKind.ArrowFunction) {
               functionDeclaration = initializer as ArrowFunction
               functionDeclarationFound = true
               break
             }
+
+            // then check for function expression
             if (initializer?.kind === SyntaxKind.FunctionExpression) {
               // @ts-expect-error
               // because the are some fields present in ArrowFunction which are not present
-              // in FunctionExpress and we don't care about those
+              // in FunctionExpression and we don't care about those
               functionDeclaration = initializer as FunctionExpression
               functionDeclarationFound = true
               break
@@ -141,6 +132,7 @@ export function parse(fileContent: string) {
     functionDeclaration = statements.find(
       (statement) => isFunctionDeclaration(statement) && isExportDefaultStatement(statement),
     ) as FunctionDeclaration | undefined
+
     if (functionDeclaration) {
       // @ts-expect-error (jsDoc is not present in the FunctionDeclaration type definition)
       meta = parseFunctionMetaFromDoc(functionDeclaration?.jsDoc?.[0])
@@ -156,6 +148,7 @@ export function parse(fileContent: string) {
     const exportDefaultStatement = statements.find(
       (statement) => isExportAssignment(statement) && statement.expression.kind === SyntaxKind.ArrowFunction,
     )
+
     if (exportDefaultStatement) {
       functionDeclaration = (exportDefaultStatement as ExportAssignment).expression as ArrowFunction
       // @ts-expect-error (jsDoc is not present in the ExportAssignment type definition)
@@ -167,12 +160,7 @@ export function parse(fileContent: string) {
     throw new Error('No default scripter function found')
   }
 
-  // sometimes the parameters of the function would depend on some of the type definitions (and interfaces)
-  // defined in the file
-  // in this version of scripter we won't support type unions (as we won't be sure to show the type of the UI for it), so we can't handle this case
-  const typeAliases = statements.filter(isTypeAliasDeclaration)
-  const interfaces = statements.filter(isInterfaceDeclaration)
+  const params = functionDeclaration.parameters.map((param) => getParamData(param, typeAliases, interfaces))
 
-  const params = parseFunctionParams(functionDeclaration, typeAliases, interfaces)
   return { params, meta }
 }

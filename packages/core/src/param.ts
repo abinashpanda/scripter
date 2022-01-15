@@ -72,7 +72,7 @@ export function getParamData(
   param: ParameterDeclaration | ts.PropertySignature,
   typeAliases: TypeAliasDeclaration[],
   interfaces: InterfaceDeclaration[],
-): ParamWithDescription | undefined {
+): ParamWithDescription {
   const jsDoc = (param as any).jsDoc as JSDocComment[] | undefined
   const meta: ParamMeta = jsDoc ? getParamsMetaDataFromJSDoc(jsDoc) : {}
 
