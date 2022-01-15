@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { CheckOutlined, ClearOutlined } from '@ant-design/icons'
 import type { Rule } from 'antd/lib/form'
+import { set } from 'lodash'
 import DatePicker from '../date-picker'
 import { maxValueValidator, minValueValidator } from '../../utils/validators'
 
@@ -23,15 +24,28 @@ type FormProps = {
 export default function Form({ params, onSubmit, submitting, className, style }: FormProps) {
   const [form] = AntdForm.useForm()
 
-  const renderParam = useCallback((param: ParamWithDescription) => {
+  const handleSubmit = useCallback(
+    (data: any) => {
+      const mergedData = {}
+      Object.entries(data).forEach(([key, value]) => {
+        set(mergedData, key, value)
+      })
+      onSubmit?.(mergedData)
+    },
+    [onSubmit],
+  )
+
+  const renderParam = useCallback((param: ParamWithDescription, root?: string | undefined) => {
     const { type, label, identifier } = param
+
+    const paramIdentifier = typeof root !== 'undefined' ? `${root}.${identifier}` : identifier
 
     switch (type) {
       case 'string': {
         return (
           <AntdForm.Item
-            key={identifier}
-            name={identifier}
+            key={paramIdentifier}
+            name={paramIdentifier}
             label={label}
             rules={[{ required: param.required, message: `${label} is required` }]}
           >
@@ -58,14 +72,14 @@ export default function Form({ params, onSubmit, submitting, className, style }:
 
         if (isSlider) {
           return (
-            <AntdForm.Item name={identifier} label={label} rules={rules} key={identifier}>
+            <AntdForm.Item name={paramIdentifier} label={label} rules={rules} key={paramIdentifier}>
               <Slider step={step} min={minValue} max={maxValue} />
             </AntdForm.Item>
           )
         }
 
         return (
-          <AntdForm.Item name={identifier} label={label} rules={rules} key={identifier}>
+          <AntdForm.Item name={paramIdentifier} label={label} rules={rules} key={paramIdentifier}>
             <InputNumber className="!w-full" placeholder={label} />
           </AntdForm.Item>
         )
@@ -74,10 +88,10 @@ export default function Form({ params, onSubmit, submitting, className, style }:
       case 'boolean': {
         return (
           <AntdForm.Item
-            name={identifier}
+            name={paramIdentifier}
             label={label}
             rules={[{ required: param.required, message: `${label} is required` }]}
-            key={identifier}
+            key={paramIdentifier}
           >
             <Switch />
           </AntdForm.Item>
@@ -105,10 +119,10 @@ export default function Form({ params, onSubmit, submitting, className, style }:
 
         return (
           <AntdForm.Item
-            name={identifier}
+            name={paramIdentifier}
             label={label}
             rules={[{ required: param.required, message: `${label} is required` }]}
-            key={identifier}
+            key={paramIdentifier}
           >
             <DatePicker
               className="w-full"
@@ -122,6 +136,15 @@ export default function Form({ params, onSubmit, submitting, className, style }:
         )
       }
 
+      case 'type': {
+        return (
+          <div className="px-4 py-2 mb-4 bg-opacity-25 border rounded-md bg-gray-50" key={paramIdentifier}>
+            <div className="mb-2 font-medium">{label}</div>
+            {param.children.map((childParam) => renderParam(childParam, paramIdentifier))}
+          </div>
+        )
+      }
+
       default: {
         return null
       }
@@ -129,16 +152,18 @@ export default function Form({ params, onSubmit, submitting, className, style }:
   }, [])
 
   return (
-    <AntdForm className={className} style={style} layout="vertical" form={form} onFinish={onSubmit}>
-      {params.map(renderParam)}
-      <div className="flex items-center space-x-4">
-        <Button type="primary" htmlType="submit" icon={<CheckOutlined />} loading={submitting}>
-          Submit
-        </Button>
-        <Button htmlType="reset" icon={<ClearOutlined />}>
-          Reset
-        </Button>
-      </div>
+    <AntdForm className={className} style={style} layout="vertical" form={form} onFinish={handleSubmit}>
+      {params.map((param) => renderParam(param))}
+      {typeof onSubmit !== 'undefined' ? (
+        <div className="flex items-center space-x-4">
+          <Button type="primary" htmlType="submit" icon={<CheckOutlined />} loading={submitting}>
+            Submit
+          </Button>
+          <Button htmlType="reset" icon={<ClearOutlined />}>
+            Reset
+          </Button>
+        </div>
+      ) : null}
     </AntdForm>
   )
 }

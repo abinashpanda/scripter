@@ -42,7 +42,7 @@ export type DateParam = {
 export type TypeParam = {
   type: 'type'
   meta: {}
-  children: Param[]
+  children: ParamWithDescription[]
 }
 
 export type Param = StringParam | NumberParam | DateParam | BooleanParam | TypeParam
