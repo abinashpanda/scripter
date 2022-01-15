@@ -1,5 +1,5 @@
 import type { Statement } from 'typescript'
-import * as ts from 'typescript'
+import { SyntaxKind } from 'typescript'
 
 export function isExportDefaultStatement(statement: Statement) {
   const { modifiers } = statement
@@ -9,7 +9,7 @@ export function isExportDefaultStatement(statement: Statement) {
   }
 
   return (
-    !!modifiers.find((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) &&
-    !!modifiers.find((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword)
+    !!modifiers.find((modifier) => modifier.kind === SyntaxKind.ExportKeyword) &&
+    !!modifiers.find((modifier) => modifier.kind === SyntaxKind.DefaultKeyword)
   )
 }

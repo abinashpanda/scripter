@@ -611,5 +611,50 @@ describe('parser', () => {
         ],
       })
     })
+
+    it('parses the parameters correctly when defined inline', () => {
+      const input = `
+      export default function createUser(
+        phoneNumber: {
+          /** @scripterParam Extension (assume + is already added, just enter the extension) */
+          extension: number
+          phoneNumber: number
+        }
+      ) {}
+      `
+
+      const { params } = parse(input)
+      expect(params[0]).toEqual({
+        identifier: 'phoneNumber',
+        label: 'Phone number',
+        type: 'type',
+        required: true,
+        meta: {},
+        children: [
+          {
+            identifier: 'extension',
+            label: 'Extension (assume + is already added, just enter the extension)',
+            type: 'number',
+            required: true,
+            meta: {
+              minValue: undefined,
+              maxValue: undefined,
+              step: undefined,
+            },
+          },
+          {
+            identifier: 'phoneNumber',
+            label: 'Phone number',
+            type: 'number',
+            required: true,
+            meta: {
+              minValue: undefined,
+              maxValue: undefined,
+              step: undefined,
+            },
+          },
+        ],
+      })
+    })
   })
 })

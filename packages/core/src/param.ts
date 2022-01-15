@@ -6,10 +6,10 @@ import type {
   TypeReferenceNode,
   TypeAliasDeclaration,
   TypeLiteralNode,
-  PropertySignature,
   InterfaceDeclaration,
+  PropertySignature,
 } from 'typescript'
-import * as ts from 'typescript'
+import { isPropertySignature, SyntaxKind } from 'typescript'
 import { upperFirst, words, lowerCase } from 'lodash'
 
 export type StringParam = {
@@ -69,7 +69,7 @@ export function getParamsMetaDataFromJSDoc(jsDocs: JSDocComment[]): ParamMeta {
 }
 
 export function getParamData(
-  param: ParameterDeclaration | ts.PropertySignature,
+  param: ParameterDeclaration | PropertySignature,
   typeAliases: TypeAliasDeclaration[],
   interfaces: InterfaceDeclaration[],
 ): ParamWithDescription {
@@ -84,7 +84,7 @@ export function getParamData(
 
   const required = !param.questionToken
 
-  if (param.type?.kind === ts.SyntaxKind.StringKeyword) {
+  if (param.type?.kind === SyntaxKind.StringKeyword) {
     return {
       identifier,
       label,
@@ -94,7 +94,7 @@ export function getParamData(
     }
   }
 
-  if (param.type?.kind === ts.SyntaxKind.NumberKeyword) {
+  if (param.type?.kind === SyntaxKind.NumberKeyword) {
     return {
       identifier,
       label,
@@ -108,7 +108,7 @@ export function getParamData(
     }
   }
 
-  if (param.type?.kind === ts.SyntaxKind.BooleanKeyword) {
+  if (param.type?.kind === SyntaxKind.BooleanKeyword) {
     return {
       identifier,
       label,
@@ -118,9 +118,9 @@ export function getParamData(
     }
   }
 
-  if (param.type.kind === ts.SyntaxKind.TypeReference) {
+  if (param.type.kind === SyntaxKind.TypeReference) {
     const typeName = (param.type as TypeReferenceNode).typeName
-    if (typeName.kind === ts.SyntaxKind.Identifier) {
+    if (typeName.kind === SyntaxKind.Identifier) {
       const identifierName = typeName.escapedText
 
       if (identifierName === 'Date') {
@@ -160,21 +160,36 @@ export function getParamData(
       }
 
       const members =
-        typeDefinitionForParam.kind === ts.SyntaxKind.TypeAliasDeclaration
+        typeDefinitionForParam.kind === SyntaxKind.TypeAliasDeclaration
           ? (typeDefinitionForParam.type as TypeLiteralNode).members
           : typeDefinitionForParam.members
-      for (const member of members) {
-        if (member.kind === ts.SyntaxKind.PropertySignature) {
-          const property = member as PropertySignature
-          const paramDataForMember = getParamData(property, typeAliases, interfaces)
-          if (paramDataForMember) {
-            paramData.children.push(paramDataForMember)
-          }
-        }
+      const properties = members.filter(isPropertySignature)
+
+      for (const property of properties) {
+        paramData.children.push(getParamData(property, typeAliases, interfaces))
       }
 
       return paramData
     }
+  }
+
+  if (param.type.kind === SyntaxKind.TypeLiteral) {
+    const paramData: ParamWithDescription = {
+      identifier,
+      label,
+      required,
+      type: 'type',
+      meta: {},
+      children: [],
+    }
+
+    const properties = (param.type as TypeLiteralNode).members.filter(isPropertySignature)
+
+    for (const property of properties) {
+      paramData.children.push(getParamData(property, typeAliases, interfaces))
+    }
+
+    return paramData
   }
 
   throw new Error(`Unknown ${param.type} for ${(param.name as Identifier).escapedText}`)
