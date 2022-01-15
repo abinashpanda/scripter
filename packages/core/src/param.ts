@@ -7,6 +7,7 @@ import type {
   TypeAliasDeclaration,
   TypeLiteralNode,
   PropertySignature,
+  InterfaceDeclaration,
 } from 'typescript'
 import * as ts from 'typescript'
 import { upperFirst, words, lowerCase } from 'lodash'
@@ -71,6 +72,7 @@ export function getParamData(
   param: ParameterDeclaration | ts.PropertySignature,
   meta: ParamMeta,
   typeAliases: TypeAliasDeclaration[],
+  interfaces: InterfaceDeclaration[],
 ): ParamWithDescription | undefined {
   const identifier = (param.name as Identifier).escapedText as string
   const label =
@@ -132,8 +134,15 @@ export function getParamData(
       }
 
       // if the identifier is not part of standard types, it is a custom type
-      const typeAliasForIdentifier = typeAliases.find((alias) => alias.name.escapedText === identifierName)
-      if (!typeAliasForIdentifier) {
+      let typeDefinitionForParam: TypeAliasDeclaration | InterfaceDeclaration | undefined
+
+      typeDefinitionForParam = typeAliases.find((alias) => alias.name.escapedText === identifierName)
+      if (!typeDefinitionForParam) {
+        typeDefinitionForParam = interfaces.find(
+          (interfaceDeclaration) => interfaceDeclaration.name.escapedText === identifierName,
+        )
+      }
+      if (!typeDefinitionForParam) {
         // @TODO: handle type imports in future version
         throw new Error(`No type definition for ${identifierName} found`)
       }
@@ -144,11 +153,14 @@ export function getParamData(
         children: [],
       }
 
-      const members = (typeAliasForIdentifier.type as TypeLiteralNode).members
+      const members =
+        typeDefinitionForParam.kind === ts.SyntaxKind.TypeAliasDeclaration
+          ? (typeDefinitionForParam.type as TypeLiteralNode).members
+          : typeDefinitionForParam.members
       for (const member of members) {
         if (member.kind === ts.SyntaxKind.PropertySignature) {
           const property = member as PropertySignature
-          const paramDataForMember = getParamData(property, meta, typeAliases)
+          const paramDataForMember = getParamData(property, meta, typeAliases, interfaces)
           if (paramDataForMember) {
             paramData.children.push(paramDataForMember)
           }

@@ -5,6 +5,8 @@ import {
   isExportAssignment,
   isVariableStatement,
   SyntaxKind,
+  isTypeAliasDeclaration,
+  isInterfaceDeclaration,
 } from 'typescript'
 import type {
   FunctionDeclaration,
@@ -15,14 +17,16 @@ import type {
   JSDocTag,
   JSDocComment,
   TypeAliasDeclaration,
+  InterfaceDeclaration,
 } from 'typescript'
 import { getParamData, getParamsMetaDataFromJSDoc } from './param'
 import type { ParamMeta, ParamWithDescription } from './param'
-import { isExportDefaultStatement, isTypeAliasDeclaration } from './statement'
+import { isExportDefaultStatement } from './statement'
 
 function parseFunctionParams(
   functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression,
   typeAliases: TypeAliasDeclaration[],
+  interfaces: InterfaceDeclaration[],
 ) {
   if (!functionDeclaration) {
     throw new Error('No default scripter function found')
@@ -33,7 +37,7 @@ function parseFunctionParams(
   for (const param of functionDeclaration.parameters) {
     const jsDoc = (param as any).jsDoc as JSDocComment[] | undefined
     const meta: ParamMeta = jsDoc ? getParamsMetaDataFromJSDoc(jsDoc) : {}
-    const paramData = getParamData(param, meta, typeAliases)
+    const paramData = getParamData(param, meta, typeAliases, interfaces)
 
     if (paramData) {
       paramDescriptions.push(paramData)
@@ -169,7 +173,8 @@ export function parse(fileContent: string) {
   // defined in the file
   // in this version of scripter we won't support type unions (as we won't be sure to show the type of the UI for it), so we can't handle this case
   const typeAliases = statements.filter(isTypeAliasDeclaration)
+  const interfaces = statements.filter(isInterfaceDeclaration)
 
-  const params = parseFunctionParams(functionDeclaration, typeAliases)
+  const params = parseFunctionParams(functionDeclaration, typeAliases, interfaces)
   return { params, meta }
 }

@@ -417,17 +417,11 @@ describe('parser', () => {
         pincode: number
       }
       
-      type PhoneNumber = {
-        extension: number
-        number: number
-      }
-      
       export default function createUser(
         firstName: string,
         lastName: string,
         email: string,
         address: Address,
-        phoneNumber: PhoneNumber,
         dateOfBirth: Date,
       ) {}
       `
@@ -476,6 +470,57 @@ describe('parser', () => {
             meta: {
               maxValue: undefined,
               minValue: undefined,
+              step: undefined,
+            },
+          },
+        ],
+      })
+    })
+
+    it('parses type definitions from interfaces correctly', () => {
+      const input = `
+      interface PhoneNumber {
+        extension: number
+        phoneNumber: number
+      }
+      
+      export default async function createUser(
+        firstName: string,
+        lastName: string,
+        email: string,
+        phoneNumber: PhoneNumber,
+        dateOfBirth: Date,
+      ) {
+      }
+      `
+
+      const { params } = parse(input)
+      expect(params[3]).toEqual({
+        identifier: 'phoneNumber',
+        label: 'Phone number',
+        type: 'type',
+        required: true,
+        meta: {},
+        children: [
+          {
+            identifier: 'extension',
+            label: 'Extension',
+            type: 'number',
+            required: true,
+            meta: {
+              minValue: undefined,
+              maxValue: undefined,
+              step: undefined,
+            },
+          },
+          {
+            identifier: 'phoneNumber',
+            label: 'Phone number',
+            type: 'number',
+            required: true,
+            meta: {
+              minValue: undefined,
+              maxValue: undefined,
               step: undefined,
             },
           },

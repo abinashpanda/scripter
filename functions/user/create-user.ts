@@ -6,9 +6,9 @@ type Address = {
   pincode: number
 }
 
-type PhoneNumber = {
+interface PhoneNumber {
   extension: number
-  number: number
+  phoneNumber: number
 }
 
 export default async function createUser(
