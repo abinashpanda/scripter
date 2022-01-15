@@ -1,5 +1,15 @@
-import type { JSDocTag, JSDocComment, ParameterDeclaration, Identifier } from 'typescript'
+import type {
+  JSDocTag,
+  JSDocComment,
+  ParameterDeclaration,
+  Identifier,
+  TypeReferenceNode,
+  TypeAliasDeclaration,
+  TypeLiteralNode,
+  PropertySignature,
+} from 'typescript'
 import * as ts from 'typescript'
+import { upperFirst, words, lowerCase } from 'lodash'
 
 export type StringParam = {
   type: 'string'
@@ -28,7 +38,13 @@ export type DateParam = {
   }
 }
 
-export type Param = StringParam | NumberParam | DateParam | BooleanParam
+export type TypeParam = {
+  type: 'type'
+  meta: {}
+  children: Param[]
+}
+
+export type Param = StringParam | NumberParam | DateParam | BooleanParam | TypeParam
 
 export type ParamWithDescription = Param & {
   identifier: string
@@ -51,17 +67,23 @@ export function getParamsMetaDataFromJSDoc(jsDocs: JSDocComment[]): ParamMeta {
   return meta
 }
 
-export function isDateParam(param: ParameterDeclaration): boolean {
-  if (param.type?.kind !== ts.SyntaxKind.TypeReference) {
-    return false
-  }
-  // @ts-ignore
-  return param.type?.typeName?.escapedText === 'Date'
-}
+export function getParamData(
+  param: ParameterDeclaration | ts.PropertySignature,
+  meta: ParamMeta,
+  typeAliases: TypeAliasDeclaration[],
+): ParamWithDescription | undefined {
+  const identifier = (param.name as Identifier).escapedText as string
+  const label =
+    meta.scripterParam ??
+    // if no scripterParam is specified, convert the identifier to a label by splitting words and joining with a space
+    upperFirst(words(identifier).map(lowerCase).join(' '))
+  const required = !param.questionToken
 
-export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Param | undefined {
   if (param.type?.kind === ts.SyntaxKind.StringKeyword) {
     return {
+      identifier,
+      label,
+      required,
       type: 'string',
       meta: {},
     }
@@ -69,6 +91,9 @@ export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Para
 
   if (param.type?.kind === ts.SyntaxKind.NumberKeyword) {
     return {
+      identifier,
+      label,
+      required,
       type: 'number',
       meta: {
         maxValue: meta.maxValue ? Number.parseFloat(meta.maxValue) : undefined,
@@ -80,18 +105,62 @@ export function getParamData(param: ParameterDeclaration, meta: ParamMeta): Para
 
   if (param.type?.kind === ts.SyntaxKind.BooleanKeyword) {
     return {
+      identifier,
+      label,
+      required,
       type: 'boolean',
       meta: {},
     }
   }
 
-  if (isDateParam(param)) {
-    return {
-      type: 'date',
-      meta: {
-        maxDate: meta.maxDate,
-        minDate: meta.minDate,
-      },
+  if (param.type.kind === ts.SyntaxKind.TypeReference) {
+    const typeName = (param.type as TypeReferenceNode).typeName
+    if (typeName.kind === ts.SyntaxKind.Identifier) {
+      const identifierName = typeName.escapedText
+
+      if (identifierName === 'Date') {
+        return {
+          identifier,
+          label,
+          required,
+          type: 'date',
+          meta: {
+            maxDate: meta.maxDate,
+            minDate: meta.minDate,
+          },
+        }
+      }
+
+      // if the identifier is not part of standard types, it is a custom type
+      const typeAliasForIdentifier = typeAliases.find((alias) => alias.name.escapedText === identifierName)
+      if (!typeAliasForIdentifier) {
+        // @TODO: handle type imports in future version
+        throw new Error(`No type definition for ${identifierName} found`)
+      }
+
+      const paramData: TypeParam = {
+        type: 'type',
+        meta: {},
+        children: [],
+      }
+
+      const members = (typeAliasForIdentifier.type as TypeLiteralNode).members
+      for (const member of members) {
+        if (member.kind === ts.SyntaxKind.PropertySignature) {
+          const property = member as PropertySignature
+          const paramDataForMember = getParamData(property, meta, typeAliases)
+          if (paramDataForMember) {
+            paramData.children.push(paramDataForMember)
+          }
+        }
+      }
+
+      return {
+        identifier,
+        label,
+        required,
+        ...paramData,
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 {
   "extends": "@scripter/configs/tsconfig/base.json",
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
   }
 }

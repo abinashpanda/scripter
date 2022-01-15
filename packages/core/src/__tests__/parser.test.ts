@@ -405,4 +405,82 @@ describe('parser', () => {
       expect(meta?.description).toBe('Completely delete user from the database and inform them on their email')
     })
   })
+
+  describe('parses complex type definitions correctly', () => {
+    it('parses parses type defintions specified using types correctly', () => {
+      const input = `
+      type Address = {
+        addressLine1: string
+        addressLine2?: string
+        state: string
+        country: string
+        pincode: number
+      }
+      
+      type PhoneNumber = {
+        extension: number
+        number: number
+      }
+      
+      export default function createUser(
+        firstName: string,
+        lastName: string,
+        email: string,
+        address: Address,
+        phoneNumber: PhoneNumber,
+        dateOfBirth: Date,
+      ) {}
+      `
+
+      const { params } = parse(input)
+      expect(params[3]).toEqual({
+        identifier: 'address',
+        label: 'Address',
+        required: true,
+        type: 'type',
+        meta: {},
+        children: [
+          {
+            identifier: 'addressLine1',
+            label: 'Address line 1',
+            required: true,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'addressLine2',
+            label: 'Address line 2',
+            required: false,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'state',
+            label: 'State',
+            required: true,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'country',
+            label: 'Country',
+            required: true,
+            type: 'string',
+            meta: {},
+          },
+          {
+            identifier: 'pincode',
+            label: 'Pincode',
+            required: true,
+            type: 'number',
+            meta: {
+              maxValue: undefined,
+              minValue: undefined,
+              step: undefined,
+            },
+          },
+        ],
+      })
+    })
+  })
 })

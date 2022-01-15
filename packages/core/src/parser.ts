@@ -14,13 +14,16 @@ import type {
   ExportAssignment,
   JSDocTag,
   JSDocComment,
+  TypeAliasDeclaration,
 } from 'typescript'
-import { upperFirst, words, lowerCase } from 'lodash'
 import { getParamData, getParamsMetaDataFromJSDoc } from './param'
 import type { ParamMeta, ParamWithDescription } from './param'
-import { isExportDefaultStatement } from './statement'
+import { isExportDefaultStatement, isTypeAliasDeclaration } from './statement'
 
-function parseFunctionParams(functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression) {
+function parseFunctionParams(
+  functionDeclaration: FunctionDeclaration | ArrowFunction | FunctionExpression,
+  typeAliases: TypeAliasDeclaration[],
+) {
   if (!functionDeclaration) {
     throw new Error('No default scripter function found')
   }
@@ -28,24 +31,12 @@ function parseFunctionParams(functionDeclaration: FunctionDeclaration | ArrowFun
   const paramDescriptions: ParamWithDescription[] = []
 
   for (const param of functionDeclaration.parameters) {
-    const identifier = (param.name as Identifier).escapedText as string
-
     const jsDoc = (param as any).jsDoc as JSDocComment[] | undefined
     const meta: ParamMeta = jsDoc ? getParamsMetaDataFromJSDoc(jsDoc) : {}
-    const paramData = getParamData(param, meta)
+    const paramData = getParamData(param, meta, typeAliases)
 
     if (paramData) {
-      const label =
-        meta.scripterParam ??
-        // if no scripterParam is specified, convert the identifier to a label by splitting words and joining with a space
-        upperFirst(words(identifier).map(lowerCase).join(' '))
-
-      paramDescriptions.push({
-        identifier,
-        label,
-        required: !param.questionToken,
-        ...paramData,
-      })
+      paramDescriptions.push(paramData)
     }
   }
 
@@ -174,6 +165,11 @@ export function parse(fileContent: string) {
     throw new Error('No default scripter function found')
   }
 
-  const params = parseFunctionParams(functionDeclaration)
+  // sometimes the parameters of the function would depend on some of the type definitions (and interfaces)
+  // defined in the file
+  // in this version of scripter we won't support type unions (as we won't be sure to show the type of the UI for it), so we can't handle this case
+  const typeAliases = statements.filter(isTypeAliasDeclaration)
+
+  const params = parseFunctionParams(functionDeclaration, typeAliases)
   return { params, meta }
 }
