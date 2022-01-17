@@ -7,6 +7,7 @@ import {
   SyntaxKind,
   isTypeAliasDeclaration,
   isInterfaceDeclaration,
+  isEnumDeclaration,
 } from 'typescript'
 import type {
   FunctionDeclaration,
@@ -53,6 +54,7 @@ export function parse(fileContent: string) {
   // in this version of scripter we won't support type unions (as we won't be sure to show the type of the UI for it), so we can't handle this case
   const typeAliases = statements.filter(isTypeAliasDeclaration)
   const interfaces = statements.filter(isInterfaceDeclaration)
+  const enums = statements.filter(isEnumDeclaration)
 
   let functionDeclaration: FunctionDeclaration | ArrowFunction | undefined
   let meta: FunctionMeta | undefined
@@ -160,7 +162,7 @@ export function parse(fileContent: string) {
     throw new Error('No default scripter function found')
   }
 
-  const params = functionDeclaration.parameters.map((param) => getParamData(param, typeAliases, interfaces))
+  const params = functionDeclaration.parameters.map((param) => getParamData(param, typeAliases, interfaces, enums))
 
   return { params, meta }
 }

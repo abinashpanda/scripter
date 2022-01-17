@@ -657,4 +657,34 @@ describe('parser', () => {
       })
     })
   })
+
+  describe('parses enum types to create select param', () => {
+    it('parses enum correctly', () => {
+      const input = `
+      enum UserType {
+        ADMIN = 'ADMIN',
+        BUYER = 'BUYER',
+        SELLER = 'SELLER',
+        THIRD_PARTY
+      }
+
+      export default function createUser(userType: UserType) {}
+      `
+
+      const { params } = parse(input)
+      expect(params[0]).toEqual({
+        identifier: 'userType',
+        label: 'User type',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'ADMIN', label: 'ADMIN' },
+          { value: 'BUYER', label: 'BUYER' },
+          { value: 'SELLER', label: 'SELLER' },
+          { value: 3, label: 'THIRD_PARTY' },
+        ],
+        meta: {},
+      })
+    })
+  })
 })

@@ -16,6 +16,12 @@ interface PhoneNumber {
   phoneNumber: number
 }
 
+enum UserType {
+  ADMIN = 'ADMIN',
+  BUYER = 'BUYER',
+  SELLER = 'SELLER',
+}
+
 export default async function createUser(
   firstName: string,
   lastName: string,
@@ -23,6 +29,7 @@ export default async function createUser(
   address: Address,
   phoneNumber: PhoneNumber,
   dateOfBirth: Date,
+  userType: UserType,
 ) {
   // wait for 1000ms
   await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -35,5 +42,6 @@ export default async function createUser(
     address,
     phoneNumber,
     dateOfBirth,
+    userType,
   }
 }
