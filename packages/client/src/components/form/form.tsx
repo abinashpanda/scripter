@@ -1,4 +1,4 @@
-import { Button, Form as AntdForm, Input, InputNumber, Slider, Switch } from 'antd'
+import { Button, Form as AntdForm, Input, InputNumber, Select, Slider, Switch } from 'antd'
 import type { ParamWithDescription } from '@scripter/core'
 import { useCallback } from 'react'
 import dayjs from 'dayjs'
@@ -132,6 +132,25 @@ export default function Form({ params, onSubmit, submitting, className, style }:
                 return minConstraint || maxConstraint
               }}
             />
+          </AntdForm.Item>
+        )
+      }
+
+      case 'select': {
+        return (
+          <AntdForm.Item
+            name={paramIdentifier}
+            label={label}
+            rules={[{ required: param.required, message: `${label} is required` }]}
+            key={paramIdentifier}
+          >
+            <Select placeholder={label}>
+              {param.options.map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
           </AntdForm.Item>
         )
       }
