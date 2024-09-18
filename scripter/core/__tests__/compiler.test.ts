@@ -162,15 +162,15 @@ describe('compiler', () => {
     expect(routes.functions).toBeTypeOf('object')
 
     expect(routes.functions).toHaveProperty('ping')
-    const pingResult = routes.functions.ping.default('pong')
+    const pingResult = routes.functions.ping('pong')
     expect(pingResult).toBe('pong pong')
 
     expect(routes.functions).toHaveProperty('sum')
-    const sumResult = routes.functions.sum.default(1, 2)
+    const sumResult = routes.functions.sum(1, 2)
     expect(sumResult).toBe(3)
 
     expect(routes.functions).toHaveProperty('user_fetch_all_users')
-    const fetchUsersResult = routes.functions.user_fetch_all_users.default('1', new Date(), 25)
+    const fetchUsersResult = routes.functions.user_fetch_all_users('1', new Date(), 25)
     expect(fetchUsersResult).toEqual(users)
   })
 })

@@ -10,7 +10,7 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
   // import all the functions in the entryFile and export all the named imports using functions variable
   const entryFile = `
     ${functionRoutes
-      .map((functionRoute) => `import * as ${getRouteVariable(functionRoute.route)} from './${functionRoute.route}'`)
+      .map((functionRoute) => `import ${getRouteVariable(functionRoute.route)} from './${functionRoute.route}'`)
       .join('\n')}
 
     export const functions = {
