@@ -7,7 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "test": "vitest",
-    "format": "prettier --write --ignore-path .gitignore --no-error-on-unmatched-pattern \"./app/**/*.{ts,tsx}\" *.{ts,tsx,cjs,js} \"./scripter/**/*.{ts,tsx}\"",
+    "format": "prettier --write --ignore-path .gitignore --no-error-on-unmatched-pattern \"./app/**/*.{ts,tsx}\" *.{ts,tsx,cjs,js} \"./scripter/**/*.{ts,tsx}\" \"./functions/**/*.ts\"",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
@@ -16,6 +16,7 @@
     "@remix-run/node": "^2.12.0",
     "@remix-run/react": "^2.12.0",
     "@remix-run/serve": "^2.12.0",
+    "axios": "^1.7.7",
     "esbuild": "^0.23.1",
     "isbot": "^4.1.0",
     "lodash": "^4.17.21",
