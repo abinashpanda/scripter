@@ -14,7 +14,7 @@ export default defineConfig({
       },
     }),
     tsconfigPaths(),
-    scripter(),
     Inspect(),
+    scripter(),
   ],
 })
