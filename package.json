@@ -6,7 +6,8 @@
   "scripts": {
     "build": "remix vite:build",
     "dev": "remix vite:dev",
-    "format": "prettier --write --ignore-path .gitignore --no-error-on-unmatched-pattern \"./app/**/*.{ts,tsx}\" *.{ts,tsx,cjs,js}",
+    "test": "vitest",
+    "format": "prettier --write --ignore-path .gitignore --no-error-on-unmatched-pattern \"./app/**/*.{ts,tsx}\" *.{ts,tsx,cjs,js} \"./scripter/**/*.{ts,tsx}\"",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
@@ -15,12 +16,16 @@
     "@remix-run/node": "^2.12.0",
     "@remix-run/react": "^2.12.0",
     "@remix-run/serve": "^2.12.0",
+    "esbuild": "^0.23.1",
     "isbot": "^4.1.0",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "ts-pattern": "^5.3.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.12.0",
+    "@types/lodash": "^4.17.7",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
@@ -38,7 +43,8 @@
     "tailwindcss": "^3.4.4",
     "typescript": "^5.1.6",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^2.1.1"
   },
   "engines": {
     "node": ">=20.0.0"
