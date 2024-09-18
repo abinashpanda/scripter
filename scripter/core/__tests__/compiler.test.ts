@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as fs from 'fs/promises'
 import { compile } from '../compiler'
 import { describe, afterEach, it, expect } from 'vitest'
+import { users } from './__fixtures__/functions/data/users'
 
 const scripterFunctionsDir = path.resolve(__dirname, './__fixtures__/functions')
 const buildDir = path.resolve(__dirname, './__fixtures__/build')
@@ -153,5 +154,23 @@ describe('compiler', () => {
     // check build file is present in the outdir
     const buildOutput = await fs.readdir(buildDir)
     expect(buildOutput).toEqual(['index.js'])
+  })
+
+  it('compiles the function correctly', async () => {
+    await compile(scripterFunctionsDir, buildDir)
+    const routes = await import(buildDir)
+    expect(routes.functions).toBeTypeOf('object')
+
+    expect(routes.functions).toHaveProperty('ping')
+    const pingResult = routes.functions.ping.default('pong')
+    expect(pingResult).toBe('pong pong')
+
+    expect(routes.functions).toHaveProperty('sum')
+    const sumResult = routes.functions.sum.default(1, 2)
+    expect(sumResult).toBe(3)
+
+    expect(routes.functions).toHaveProperty('user_fetch_all_users')
+    const fetchUsersResult = routes.functions.user_fetch_all_users.default('1', new Date(), 25)
+    expect(fetchUsersResult).toEqual(users)
   })
 })
