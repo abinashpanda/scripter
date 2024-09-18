@@ -1,6 +1,8 @@
 import { vitePlugin as remix } from '@remix-run/dev'
 import { defineConfig } from 'vite'
+import Inspect from 'vite-plugin-inspect'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import scripter from './vite-scripter'
 
 export default defineConfig({
   plugins: [
@@ -12,5 +14,7 @@ export default defineConfig({
       },
     }),
     tsconfigPaths(),
+    scripter(),
+    Inspect(),
   ],
 })

@@ -13,7 +13,7 @@ import type {
   NumericLiteral,
 } from 'typescript'
 import { isPropertySignature, SyntaxKind } from 'typescript'
-import { upperFirst, words, lowerCase } from 'lodash'
+import { upperFirst, words, lowerCase } from 'lodash-es'
 import { match } from 'ts-pattern'
 
 export type BaseParam = {

@@ -1,4 +1,4 @@
-import { capitalize, words } from 'lodash'
+import { capitalize, words } from 'lodash-es'
 import { ParamWithDescription } from './param'
 
 export type FunctionRoute = {
