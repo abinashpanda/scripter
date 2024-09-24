@@ -59,7 +59,7 @@ const config = {
       plugins: ['@typescript-eslint', 'import'],
       parser: '@typescript-eslint/parser',
       settings: {
-        'import/internal-regex': '^~/',
+        'import/internal-regex': '^@/',
         'import/resolver': {
           node: {
             extensions: ['.ts', '.tsx'],
