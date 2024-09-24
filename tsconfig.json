@@ -5,7 +5,8 @@
     "**/.server/**/*.ts",
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
+    "**/.client/**/*.tsx",
+    "scripter.d.ts"
   ],
   "compilerOptions": {
     "lib": [
@@ -15,7 +16,7 @@
     ],
     "types": [
       "@remix-run/node",
-      "vite/client"
+      "vite/client",
     ],
     "isolatedModules": true,
     "esModuleInterop": true,

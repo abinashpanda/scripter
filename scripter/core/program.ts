@@ -5,7 +5,7 @@ import { getRouteVariable, getFunctionRoutes } from './route'
 
 export type Program = void
 
-export async function compileProgram(rootDir: string, outputDir: string, routes: Route[]) {
+export function getEntryFileContent(rootId: string, routes: Route[]) {
   const functionRoutes = getFunctionRoutes(routes)
   // import all the functions in the entryFile and export all the named imports using functions variable
   const entryFile = `
@@ -30,7 +30,11 @@ export async function compileProgram(rootDir: string, outputDir: string, routes:
       2,
     )}
   `
+  return entryFile
+}
 
+export async function compileProgram(rootDir: string, outputDir: string, routes: Route[]) {
+  const entryFile = getEntryFileContent(rootDir, routes)
   return await esbuild.build({
     stdin: {
       contents: entryFile,

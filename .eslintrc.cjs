@@ -70,6 +70,9 @@ const config = {
         },
       },
       extends: ['plugin:@typescript-eslint/recommended', 'plugin:import/recommended', 'plugin:import/typescript'],
+      rules: {
+        'import/no-unresolved': ['error', { ignore: ['^virtual:'] }],
+      },
     },
 
     // Node

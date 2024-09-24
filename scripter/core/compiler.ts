@@ -10,7 +10,7 @@ async function isDir(path: string): Promise<boolean> {
   return stat.isDirectory()
 }
 
-async function compileRoutes(rootDirPath: string, rootDirName?: string) {
+export async function compileRoutes(rootDirPath: string, rootDirName?: string) {
   const routes: Route[] = []
 
   const dirContent = await fs.readdir(rootDirPath)

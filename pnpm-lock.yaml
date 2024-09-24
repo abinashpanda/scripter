@@ -42,6 +42,9 @@ importers:
         specifier: ^5.3.1
         version: 5.3.1
     devDependencies:
+      '@hyrious/esbuild-plugin-commonjs':
+        specifier: ^0.2.4
+        version: 0.2.4(esbuild@0.23.1)
       '@remix-run/dev':
         specifier: ^2.12.0
         version: 2.12.0(@remix-run/react@2.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2))(@remix-run/serve@2.12.0(typescript@5.6.2))(@types/node@22.5.5)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5))
@@ -718,6 +721,16 @@ packages:
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
+
+  '@hyrious/esbuild-plugin-commonjs@0.2.4':
+    resolution: {integrity: sha512-NKR8bsDbNP7EpM//cjoo8Bpihmc97gPpnwrggG+18iSGow6oaJpfmy3Bv+oBgPkPlxcGzC9SXh+6szoCoKFvCw==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      cjs-module-lexer: '*'
+      esbuild: '*'
+    peerDependenciesMeta:
+      cjs-module-lexer:
+        optional: true
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -4495,6 +4508,10 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/object-schema@2.0.3': {}
+
+  '@hyrious/esbuild-plugin-commonjs@0.2.4(esbuild@0.23.1)':
+    dependencies:
+      esbuild: 0.23.1
 
   '@isaacs/cliui@8.0.2':
     dependencies:

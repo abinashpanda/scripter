@@ -1,22 +1,60 @@
 import path from 'path'
 import { Plugin, normalizePath } from 'vite'
-import { compile } from './scripter/core'
+import esbuild from 'esbuild'
+import { commonjs } from '@hyrious/esbuild-plugin-commonjs'
+import { compileRoutes, getEntryFileContent } from './scripter/core'
 import { pino } from 'pino'
+
+function vModuleId(name: string) {
+  return `virtual:scripter/${name}`
+}
+
+function resolvedVModuleId(name: string) {
+  return `\0${vModuleId(name)}`
+}
+
+async function generateEntryFile(rootDir: string) {
+  const routes = await compileRoutes(rootDir)
+  const entryFile = getEntryFileContent(rootDir, routes)
+  const output = await esbuild.build({
+    stdin: {
+      contents: entryFile,
+      resolveDir: rootDir,
+    },
+    format: 'esm',
+    logLevel: 'silent',
+    bundle: true,
+    write: false,
+    platform: 'node',
+    plugins: [commonjs()],
+  })
+  const text = output.outputFiles?.[0].text
+  return text
+}
 
 export default function scripter(): Plugin<unknown> {
   let shouldRun = false
+  const inputDir = path.resolve(__dirname, 'functions')
 
   return {
     name: 'vite-scripter',
-    apply: 'serve',
     config(config) {
       shouldRun = !!config.ssr
+    },
+    resolveId: (id) => {
+      if (id === vModuleId('entry')) {
+        return resolvedVModuleId('entry')
+      }
+    },
+    load: async (id) => {
+      if (id === resolvedVModuleId('entry')) {
+        return await generateEntryFile(inputDir)
+      }
     },
     async configureServer(server) {
       if (!shouldRun) {
         return
       }
-
       const logger = pino({
         transport: {
           target: 'pino-pretty',
@@ -28,42 +66,30 @@ export default function scripter(): Plugin<unknown> {
         },
       })
 
-      const inputDir = path.resolve(__dirname, 'functions')
-      const outputDir = path.resolve(__dirname, '.scripter-build')
+      logger.info('scripter started')
+      server.watcher.on('all', async (eventName, path) => {
+        const normalizedPath = normalizePath(path)
+        if (!normalizedPath.includes(inputDir)) {
+          return
+        }
 
-      logger.info('compiling functions')
-      try {
-        await compile(inputDir, outputDir)
-        logger.info('compiled functions')
+        if (eventName === 'add') {
+          logger.info(`file added: ${normalizedPath}`)
+        } else if (eventName === 'change') {
+          logger.info(`file updated: ${normalizedPath}`)
+        } else if (eventName === 'unlink') {
+          logger.warn(`file deleted: ${normalizedPath}`)
+        } else if (eventName === 'unlinkDir') {
+          logger.warn(`directory deleted: ${normalizedPath}`)
+        }
 
-        server.watcher.on('all', async (eventName, path) => {
-          const normalizedPath = normalizePath(path)
-
-          if (normalizedPath.includes(outputDir)) {
-            return
-          }
-
-          if (eventName === 'add') {
-            logger.info(`file added: ${normalizedPath}`)
-          } else if (eventName === 'change') {
-            logger.info(`file updated: ${normalizedPath}`)
-          } else if (eventName === 'unlink') {
-            logger.warn(`file deleted: ${normalizedPath}`)
-          } else if (eventName === 'unlinkDir') {
-            logger.warn(`directory deleted: ${normalizedPath}`)
-          }
-
-          try {
-            await compile(inputDir, outputDir)
-            logger.info('recompiled functions')
-            server.ws.send('reload')
-          } catch (error) {
-            logger.error('error recompiling functions', error)
-          }
-        })
-      } catch (error) {
-        logger.error('error compiling functions', error)
-      }
+        logger.info('updating functions')
+        const entryModule = server.moduleGraph.getModuleById(resolvedVModuleId('entry'))
+        if (entryModule) {
+          server.moduleGraph.invalidateModule(entryModule)
+        }
+        server.ws.send('reload')
+      })
     },
   }
 }
