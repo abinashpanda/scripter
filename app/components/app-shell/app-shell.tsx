@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react'
 import { Route as ScripterRoute } from '@scripter/core'
-import { FunctionSquareIcon, PackageIcon, CpuIcon } from 'lucide-react'
+import { FunctionSquareIcon, PackageIcon, CpuIcon, ChevronDownIcon } from 'lucide-react'
+import * as Accordion from '@radix-ui/react-accordion'
 import { useCallback } from 'react'
 import { match } from 'ts-pattern'
 
@@ -26,13 +27,22 @@ export default function AppShell({ routes, children }: AppShellProps) {
       })
       .with({ type: 'module' }, (moduleRoute) => {
         return (
-          <div className="overflow-hidden rounded-lg border text-sm" key={moduleRoute.route}>
-            <div className="bg-muted flex items-center gap-2 truncate border-b p-2 text-sm">
+          <Accordion.Item
+            value={moduleRoute.route}
+            className="divide-y overflow-hidden rounded-lg border text-sm"
+            key={moduleRoute.route}
+          >
+            <Accordion.Header className="bg-muted flex items-center gap-2 truncate p-2 text-sm">
               <PackageIcon className="text-muted-foreground h-4 w-4" />
               <span className="flex-1 truncate">{moduleRoute.title}</span>
-            </div>
-            <div className="space-y-2 p-2">{moduleRoute.children.map(renderRoute)}</div>
-          </div>
+              <Accordion.Trigger className="hover:bg-background flex items-center justify-center rounded-md p-0.5 transition-transform data-[state='open']:rotate-180">
+                <ChevronDownIcon className="h-4 w-4" />
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down space-y-2 overflow-hidden p-2 transition-all">
+              {moduleRoute.children.map(renderRoute)}
+            </Accordion.Content>
+          </Accordion.Item>
         )
       })
       .otherwise(() => null)
@@ -45,9 +55,9 @@ export default function AppShell({ routes, children }: AppShellProps) {
           <CpuIcon className="h-6 w-6" />
           <div className="font-semibold">Scripter</div>
         </div>
-        <div className="flex-1 space-y-2 overflow-auto rounded-xl border p-2">
+        <Accordion.Root className="flex-1 space-y-2 overflow-auto rounded-xl border p-2" type="multiple">
           {routes.map((route) => renderRoute(route))}
-        </div>
+        </Accordion.Root>
       </div>
       <div className="flex-1 overflow-auto p-4">{children}</div>
     </div>
