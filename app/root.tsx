@@ -1,8 +1,6 @@
-import { useEffect } from 'react'
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData, useRevalidator } from '@remix-run/react'
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
 import type { LinksFunction } from '@remix-run/node'
 import './globals.css'
-import AppShell from './components/app-shell'
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -17,26 +15,7 @@ export const links: LinksFunction = () => [
   },
 ]
 
-export async function loader() {
-  const { routes } = await import('virtual:scripter/entry')
-  return { routes }
-}
-
 export function Layout({ children }: { children: React.ReactNode }) {
-  const revalidator = useRevalidator()
-  const { routes } = useLoaderData<typeof loader>()
-
-  useEffect(
-    function reloadOnServerMessage() {
-      if (import.meta.hot) {
-        import.meta.hot.on('reload', () => {
-          revalidator.revalidate()
-        })
-      }
-    },
-    [revalidator],
-  )
-
   return (
     <html lang="en">
       <head>
@@ -46,7 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppShell routes={routes}>{children}</AppShell>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -18,9 +18,9 @@ export default function AppShell({ routes, children }: AppShellProps) {
           <Link
             to={`${functionRoute.route}`}
             key={route.route}
-            className="hover:bg-muted flex items-center gap-2 truncate rounded-lg p-2 text-sm"
+            className="flex items-center gap-2 truncate rounded-lg p-2 text-sm hover:bg-muted"
           >
-            <FunctionSquareIcon className="text-muted-foreground h-4 w-4" />
+            <FunctionSquareIcon className="size-4 text-muted-foreground" />
             <span className="flex-1 truncate">{functionRoute.title}</span>
           </Link>
         )
@@ -32,14 +32,14 @@ export default function AppShell({ routes, children }: AppShellProps) {
             className="divide-y overflow-hidden rounded-lg border text-sm"
             key={moduleRoute.route}
           >
-            <Accordion.Header className="bg-muted flex items-center gap-2 truncate p-2 text-sm">
-              <PackageIcon className="text-muted-foreground h-4 w-4" />
+            <Accordion.Header className="flex items-center gap-2 truncate bg-muted p-2 text-sm">
+              <PackageIcon className="size-4 text-muted-foreground" />
               <span className="flex-1 truncate">{moduleRoute.title}</span>
-              <Accordion.Trigger className="hover:bg-background flex items-center justify-center rounded-md p-0.5 transition-transform data-[state='open']:rotate-180">
-                <ChevronDownIcon className="h-4 w-4" />
+              <Accordion.Trigger className="flex items-center justify-center rounded-md p-0.5 transition-transform hover:bg-background data-[state='open']:rotate-180">
+                <ChevronDownIcon className="size-4" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down space-y-2 overflow-hidden p-2 transition-all">
+            <Accordion.Content className="space-y-2 overflow-hidden p-2 transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
               {moduleRoute.children.map(renderRoute)}
             </Accordion.Content>
           </Accordion.Item>
@@ -51,10 +51,10 @@ export default function AppShell({ routes, children }: AppShellProps) {
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="flex w-[320px] flex-col gap-4 p-4">
-        <div className="flex items-center gap-2">
-          <CpuIcon className="h-6 w-6" />
+        <Link to="/" className="flex items-center gap-2">
+          <CpuIcon className="size-6" />
           <div className="font-semibold">Scripter</div>
-        </div>
+        </Link>
         <Accordion.Root className="flex-1 space-y-2 overflow-auto rounded-xl border p-2" type="multiple">
           {routes.map((route) => renderRoute(route))}
         </Accordion.Root>

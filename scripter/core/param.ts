@@ -45,9 +45,11 @@ export type DateParam = BaseParam & {
   }
 }
 
+export type SelectValue = string | number
+
 export type SelectParam = BaseParam & {
   type: 'select'
-  options: { value: unknown; label: string }[]
+  options: { value: SelectValue; label: string }[]
 }
 
 export type TypeParam = BaseParam & {
@@ -164,14 +166,14 @@ export function getParamData(
       // if the type is a enum then in that case we would return a select param
       const enumFound = enums.find((e) => e.name.escapedText === identifierName)
       if (enumFound) {
-        const options: { value: unknown; label: string }[] = []
+        const options: { value: SelectValue; label: string }[] = []
         let index = 0
         for (const member of enumFound.members) {
           if (member.name.kind !== SyntaxKind.Identifier) {
             throw new Error(`Enum member ${member.name.getText()} is not an identifier`)
           }
           const label = member.name.escapedText.toString()
-          let value: number | string = index
+          let value: SelectValue = index
           if (member.initializer) {
             if (
               member.initializer.kind !== SyntaxKind.StringLiteral &&

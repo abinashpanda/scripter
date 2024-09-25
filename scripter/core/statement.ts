@@ -1,8 +1,8 @@
-import type { Statement } from 'typescript'
+import type { FunctionDeclaration } from 'typescript'
 import { SyntaxKind } from 'typescript'
 
-export function isExportDefaultStatement(statement: Statement) {
-  const { modifiers } = statement
+export function isExportDefaultStatement(statement: FunctionDeclaration) {
+  const modifiers = statement.modifiers
 
   if (!modifiers) {
     return false
